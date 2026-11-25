@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify, session, send_file, redirect, url_for
 import sqlite3
+import psycopg2
+from psycopg2.extras import RealDictCursor
 import io
 import os
 import re
@@ -25,6 +27,9 @@ MAIL_APP_PASSWORD = os.environ.get('MAIL_APP_PASSWORD', 'avci qjht ymhu qmhl')
 ADMIN_NAME = 'Admin Manajemenku'
 ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'muzarhabib@gmail.com').strip().lower()
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'ubsi17260325')
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+USE_POSTGRES = bool(DATABASE_URL)
 
 GMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@gmail\.com$', re.IGNORECASE)
 
@@ -71,59 +76,135 @@ def send_otp_email(recipient_gmail, otp_code, username):
         server.sendmail(MAIL_SENDER, recipient_gmail, msg.as_string())
 
 
+class DBWrapper:
+    def __init__(self):
+        if USE_POSTGRES:
+            self.conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+            self.cur = self.conn.cursor()
+        else:
+            self.conn = sqlite3.connect('manajemenku.db')
+            self.conn.row_factory = sqlite3.Row
+            self.cur = self.conn.cursor()
+
+    def execute(self, query, params=()):
+        if USE_POSTGRES:
+            query = query.replace('?', '%s')
+        self.cur.execute(query, params)
+        return self.cur
+
+    def commit(self):
+        self.conn.commit()
+
+    def close(self):
+        self.cur.close()
+        self.conn.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type:
+            self.conn.rollback()
+        self.close()
+
+
 def get_db_connection():
-    conn = sqlite3.connect('manajemenku.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+    return DBWrapper()
 
 
 # Inisialisasi Database
 with get_db_connection() as conn:
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            full_name TEXT NOT NULL,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            initial_balance REAL DEFAULT 0,
-            savings_goal REAL DEFAULT 0,
-            is_setup_completed INTEGER DEFAULT 0,
-            is_premium INTEGER DEFAULT 0
-        )
-    ''')
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS transactions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            title TEXT NOT NULL,
-            type TEXT NOT NULL,
-            category TEXT NOT NULL,
-            amount REAL NOT NULL,
-            date TEXT NOT NULL,
-            FOREIGN KEY (user_id) REFERENCES users (id)
-        )
-    ''')
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS password_resets (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            gmail TEXT NOT NULL,
-            otp_code TEXT NOT NULL,
-            expires_at INTEGER NOT NULL
-        )
-    ''')
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS device_telemetry (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            gmail TEXT,
-            device_info TEXT,
-            cookie_consent INTEGER DEFAULT 0,
-            location_granted INTEGER DEFAULT 0,
-            latitude REAL,
-            longitude REAL,
-            updated_at TEXT
-        )
-    ''')
+    if USE_POSTGRES:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                full_name TEXT NOT NULL,
+                username TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                initial_balance DOUBLE PRECISION DEFAULT 0,
+                savings_goal DOUBLE PRECISION DEFAULT 0,
+                is_setup_completed INTEGER DEFAULT 0,
+                is_premium INTEGER DEFAULT 0
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS transactions (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL REFERENCES users (id),
+                title TEXT NOT NULL,
+                type TEXT NOT NULL,
+                category TEXT NOT NULL,
+                amount DOUBLE PRECISION NOT NULL,
+                date TEXT NOT NULL
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id SERIAL PRIMARY KEY,
+                gmail TEXT NOT NULL,
+                otp_code TEXT NOT NULL,
+                expires_at BIGINT NOT NULL
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS device_telemetry (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER,
+                gmail TEXT,
+                device_info TEXT,
+                cookie_consent INTEGER DEFAULT 0,
+                location_granted INTEGER DEFAULT 0,
+                latitude DOUBLE PRECISION,
+                longitude DOUBLE PRECISION,
+                updated_at TEXT
+            )
+        ''')
+    else:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                full_name TEXT NOT NULL,
+                username TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                initial_balance REAL DEFAULT 0,
+                savings_goal REAL DEFAULT 0,
+                is_setup_completed INTEGER DEFAULT 0,
+                is_premium INTEGER DEFAULT 0
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS transactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                title TEXT NOT NULL,
+                type TEXT NOT NULL,
+                category TEXT NOT NULL,
+                amount REAL NOT NULL,
+                date TEXT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                gmail TEXT NOT NULL,
+                otp_code TEXT NOT NULL,
+                expires_at INTEGER NOT NULL
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS device_telemetry (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                gmail TEXT,
+                device_info TEXT,
+                cookie_consent INTEGER DEFAULT 0,
+                location_granted INTEGER DEFAULT 0,
+                latitude REAL,
+                longitude REAL,
+                updated_at TEXT
+            )
+        ''')
     conn.commit()
 
 
@@ -389,14 +470,23 @@ def register():
             if existing_gmail:
                 return jsonify({'success': False, 'message': 'Alamat Gmail ini sudah terdaftar!'})
 
-            cur = conn.execute('INSERT INTO users (full_name, username, password) VALUES (?, ?, ?)',
-                               (gmail_address, username, password))
-            new_user_id = cur.lastrowid
+            if USE_POSTGRES:
+                row = conn.execute(
+                    'INSERT INTO users (full_name, username, password) VALUES (?, ?, ?) RETURNING id',
+                    (gmail_address, username, password)
+                ).fetchone()
+                new_user_id = row['id']
+            else:
+                cur = conn.execute(
+                    'INSERT INTO users (full_name, username, password) VALUES (?, ?, ?)',
+                    (gmail_address, username, password)
+                )
+                new_user_id = cur.lastrowid
             conn.commit()
 
         log_device_session(user_id=new_user_id, gmail=gmail_address, cookie_consent=1)
         return jsonify({'success': True, 'message': 'Registrasi berhasil! Silakan login.'})
-    except sqlite3.IntegrityError:
+    except (sqlite3.IntegrityError, psycopg2.IntegrityError):
         return jsonify({'success': False, 'message': 'Username sudah digunakan!'})
 
 
@@ -502,7 +592,7 @@ def get_chart_data():
     conn = get_db_connection()
     cursor = conn.execute('''
         SELECT
-            strftime('%Y-%m', date) as bulan,
+            SUBSTRING(date, 1, 7) as bulan,
             SUM(CASE WHEN type='income' THEN amount ELSE 0 END) as total_income,
             SUM(CASE WHEN type='expense' THEN amount ELSE 0 END) as total_expense
         FROM transactions
@@ -582,8 +672,8 @@ def export_pdf():
                            logo_right_img if logo_right_img else Paragraph('', styles['Normal'])]],
                          colWidths=[50, 425, 50])
     header_table.setStyle(TableStyle([
-        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]))
     elements.append(header_table)
     elements.append(Spacer(1, 10))
@@ -600,12 +690,12 @@ def export_pdf():
     ]
     summary_table = Table(summary_data, colWidths=[175, 175, 175])
     summary_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), colors.HexColor('#0f172a')),
-        ('TOPPADDING', (0,0), (-1,-1), 8),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
-        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-        ('GRID', (0,0), (-1,-1), 1, colors.HexColor('#1e293b')),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#0f172a')),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#1e293b')),
         ('ROUNDEDCORNERS', [6, 6, 6, 6])
     ]))
     elements.append(summary_table)
@@ -619,18 +709,18 @@ def export_pdf():
 
     t = Table(table_data, colWidths=[120, 110, 85, 80, 110])
     t.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#4f46e5')),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0,0), (-1,0), 9),
-        ('ALIGN', (0,0), (-1,-1), 'LEFT'),
-        ('ALIGN', (4,0), (4,-1), 'RIGHT'),
-        ('BOTTOMPADDING', (0,0), (-1,0), 6),
-        ('TOPPADDING', (0,0), (-1,0), 6),
-        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.HexColor('#f8fafc'), colors.HexColor('#ffffff')]),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#e2e8f0')),
-        ('FONTNAME', (0,1), (-1,-1), 'Helvetica'),
-        ('FONTSIZE', (0,1), (-1,-1), 8),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4f46e5')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 9),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (4, 0), (4, -1), 'RIGHT'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+        ('TOPPADDING', (0, 0), (-1, 0), 6),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#f8fafc'), colors.HexColor('#ffffff')]),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
     ]))
     elements.append(t)
 
@@ -641,13 +731,16 @@ def export_pdf():
     buffer.seek(0)
     return send_file(buffer, as_attachment=True, download_name=f"Laporan_Keuangan_{user['username']}.pdf", mimetype='application/pdf')
 
+
 @app.route("/hutang-piutang")
 def hutang_piutang_page():
     return render_template("hutang_piutang.html")
 
+
 @app.route("/tentang-kami")
 def tentang_kami():
     return render_template("tentang_kami.html", is_vip=session.get("is_vip", False))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
