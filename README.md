@@ -20,23 +20,35 @@
 
 ## Struktur Proyek
 
-* `main.py` — Aplikasi utama Flask & *routing* API
-* `requirements.txt` — Daftar dependensi Python
-* `static/` — Aset gambar & logo (`Manajemenku.png`, dll.)
-* `templates/` — Halaman HTML (`login`, `index`, `split_bill`, dll.)
+## Struktur Proyek
+
+```text
+Manajemenku/
+├── main.py              # File utama aplikasi web Flask & routing API
+├── requirements.txt     # Daftar dependensi Python
+├── static/              # Aset gambar & logo aplikasi (Manajemenku.png, dll.)
+└── templates/           # Halaman antarmuka HTML (login, index, split_bill, dll.)
+```
 
 ## Cara Menjalankan di Lokal
 
 1. Clone repository:
-   `git clone https://github.com/nazaramru08-cyber/Manajemenku.git`
-2. Masuk ke folder proyek:
-   `cd Manajemenku`
-3. Instal dependensi:
-   `pip install -r requirements.txt`
-4. Jalankan aplikasi:
-   `python main.py`
-5. Buka di browser:
-   `http://127.0.0.1:5000`
+   ```
+   git clone https://github.com/nazaramru08-cyber/Manajemenku.git
+   cd Manajemenku
+   ```
+4. Instal dependensi:
+   ``` Bash
+   pip install -r requirements.txt
+   ```
+6. Jalankan aplikasi:
+   ``` Bash
+   python main.py
+   ```
+8. Buka di browser:
+   ```Akses
+   http://127.0.0.1:5000
+   ```
 
 ## Tim Pengembang
 
