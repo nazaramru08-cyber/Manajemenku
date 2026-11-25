@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Manajemenku - Akses Keamanan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #050811;
+            background-image: radial-gradient(rgba(34, 211, 238, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: #e2e8f0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .cyber-panel {
+            background: rgba(9, 15, 29, 0.94);
+            border: 1px solid rgba(34, 211, 238, 0.25);
+            box-shadow: 0 0 40px rgba(6, 182, 212, 0.08);
+        }
+        .cyber-input {
+            background: #070d19;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            color: #f8fafc;
+        }
+        .cyber-input:focus {
+            outline: none;
+            border-color: #22d3ee;
+            box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.18);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="cyber-panel w-full max-w-md rounded-2xl p-8 space-y-6">
+        <div class="border-b border-cyan-500/20 pb-4 space-y-1">
+            <div class="flex items-center gap-2 text-cyan-400 text-xs uppercase tracking-widest">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>SOC / ROOT ACCESS GATEWAY</span>
+            </div>
+            <h1 class="text-2xl font-bold text-white tracking-tight">{{ admin_name }}</h1>
+            <p class="text-xs text-slate-400">Autentikasi khusus administrator sistem Manajemenku</p>
+        </div>
+
+        <div id="adminAlert" class="{% if not error %}hidden{% endif %} p-3 rounded-xl text-xs bg-rose-500/10 border border-rose-500/30 text-rose-300">
+            {{ error or '' }}
+        </div>
+
+        <form id="adminLoginForm" onsubmit="submitAdminLogin(event)" class="space-y-4">
+            <div>
+                <label class="block text-xs text-cyan-300 mb-1.5 uppercase tracking-wider">Gmail Admin</label>
+                <input type="email" id="adminEmail" name="gmail" required placeholder="muzarhabib@gmail.com" class="w-full cyber-input p-3 rounded-xl text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs text-cyan-300 mb-1.5 uppercase tracking-wider">Sandi Admin</label>
+                <div class="relative">
+                    <input type="password" id="adminPassword" name="password" required placeholder="••••••••••••" class="w-full cyber-input p-3 pr-10 rounded-xl text-sm">
+                    <button type="button" onclick="togglePass()" class="absolute inset-y-0 right-0 px-3 text-slate-400 hover:text-cyan-300 flex items-center">
+                        <i id="eyeAdmin" class="fa-solid fa-eye text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full py-3 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-200 font-bold text-sm tracking-wide transition">
+                <i class="fa-solid fa-terminal mr-2"></i> MASUK PANEL ADMIN
+            </button>
+        </form>
+
+        <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <a href="/" class="hover:text-cyan-300"><i class="fa-solid fa-arrow-left mr-1"></i> Halaman Utama</a>
+            <span class="text-emerald-400">● TLS / SESSION ACTIVE</span>
+        </div>
+    </div>
+
+    <script>
+        function togglePass() {
+            const input = document.getElementById('adminPassword');
+            const icon = document.getElementById('eyeAdmin');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        async function submitAdminLogin(e) {
+            e.preventDefault();
+            const alertEl = document.getElementById('adminAlert');
+            const gmail = document.getElementById('adminEmail').value.trim().toLowerCase();
+            const password = document.getElementById('adminPassword').value;
+
+            const res = await fetch('/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gmail, password })
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.href = data.redirect_url || '/admin/users';
+            } else {
+                alertEl.classList.remove('hidden');
+                alertEl.textContent = data.message || 'Login gagal.';
+            }
+        }
+    </script>
+</body>
+</html>

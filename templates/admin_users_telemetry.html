@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Telemetry & Identitas Pengguna - Admin Manajemenku</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #050811;
+            color: #e2e8f0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .cyber-card {
+            background: #091020;
+            border: 1px solid rgba(34, 211, 238, 0.22);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+    <div>
+        <!-- Topbar Cyber -->
+        <header class="border-b border-cyan-500/20 bg-[#070c18] px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 rounded bg-cyan-500/15 border border-cyan-400/40 text-cyan-300 text-xs font-bold">
+                    CYBER SEC OPS
+                </span>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold text-white">{{ admin_name }}</h1>
+                    <p class="text-xs text-slate-400">{{ admin_email }}</p>
+                </div>
+            </div>
+
+            <nav class="flex flex-wrap items-center gap-2 text-xs">
+                <a href="/admin/users" class="px-3 py-2 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 font-semibold">
+                    <i class="fa-solid fa-users-viewfinder mr-1"></i> Akun & Perangkat
+                </a>
+                <a href="/admin/analytics" class="px-3 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300">
+                    <i class="fa-solid fa-globe mr-1"></i> Diagram & Hologram Globe
+                </a>
+                <a href="/admin/logout" class="px-3 py-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300">
+                    <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+                </a>
+            </nav>
+        </header>
+
+        <!-- Banner Izin Cookie & Lokasi Perangkat -->
+        <div class="max-w-7xl mx-auto px-6 pt-6">
+            <div class="cyber-card rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="text-xs space-y-1">
+                    <div class="text-cyan-300 font-bold uppercase tracking-wider">
+                        <i class="fa-solid fa-cookie-bite mr-1"></i> Kebijakan Izin Cookie & Lokasi Perangkat (Global)
+                    </div>
+                    <p class="text-slate-400">
+                        Cookie dan permintaan izin lokasi aktif di seluruh halaman website. Lokasi dan perangkat dicatat ketika pengunjung menyetujui izin browser; sandi pengguna ditampakkan untuk kebutuhan bantuan akun.
+                    </p>
+                </div>
+                <button type="button" onclick="requestDeviceConsent()" class="px-4 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-200 text-xs font-bold shrink-0">
+                    <i class="fa-solid fa-location-crosshairs mr-1.5"></i> Uji & Catat Izin Lokasi Sesi Ini
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabel Data Pengguna & Telemetri -->
+        <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="cyber-card rounded-xl p-4">
+                    <div class="text-xs text-slate-400">TOTAL GMAIL TERDAFTAR</div>
+                    <div id="statUsers" class="text-2xl font-bold text-cyan-300 mt-1">0</div>
+                </div>
+                <div class="cyber-card rounded-xl p-4">
+                    <div class="text-xs text-slate-400">IZIN LOKASI AKTIF</div>
+                    <div id="statLoc" class="text-2xl font-bold text-emerald-400 mt-1">0</div>
+                </div>
+                <div class="cyber-card rounded-xl p-4">
+                    <div class="text-xs text-slate-400">MODE PANEL ADMIN</div>
+                    <div class="text-sm font-bold text-amber-300 mt-2">VISIBLE PASSWORD + GLOBAL COOKIE</div>
+                </div>
+            </div>
+
+            <div class="cyber-card rounded-xl overflow-hidden">
+                <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-300">
+                        <i class="fa-solid fa-database mr-1.5"></i> Log Akun, Sandi Pengguna, Perangkat & Lokasi
+                    </span>
+                    <button type="button" onclick="loadTelemetry()" class="text-xs text-slate-300 hover:text-cyan-300">
+                        <i class="fa-solid fa-rotate mr-1"></i> Refresh
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-[#070c18] text-cyan-300 border-b border-slate-800">
+                            <tr>
+                                <th class="py-3 px-4">Gmail Pengguna</th>
+                                <th class="py-3 px-4">Username</th>
+                                <th class="py-3 px-4">Sandi</th>
+                                <th class="py-3 px-4">Perangkat / User-Agent</th>
+                                <th class="py-3 px-4">Cookie & Lokasi</th>
+                                <th class="py-3 px-4">Koordinat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="telemetryBody" class="divide-y divide-slate-800/80">
+                            <tr>
+                                <td colspan="6" class="py-6 px-4 text-center text-slate-500">Memuat data telemetri...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="border-t border-slate-800 py-4 px-6 text-center text-xs text-slate-500">
+        MANAJEMENKU SECURITY CONSOLE • NO BACKGROUND IMAGE • 2026
+    </footer>
+
+    <script>
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function toggleAdminRowPassword(userId) {
+            const span = document.getElementById(`pass-text-${userId}`);
+            const icon = document.getElementById(`pass-icon-${userId}`);
+            if (!span || !icon) return;
+
+            const isVisible = span.getAttribute('data-visible') === '1';
+            const secret = span.getAttribute('data-secret') || '-';
+            if (isVisible) {
+                span.textContent = '••••••••';
+                span.setAttribute('data-visible', '0');
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            } else {
+                span.textContent = secret;
+                span.setAttribute('data-visible', '1');
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            }
+        }
+
+        async function loadTelemetry() {
+            const res = await fetch('/api/admin/overview');
+            const data = await res.json();
+            if (!data.success) return;
+
+            document.getElementById('statUsers').textContent = data.stats.total_users;
+            document.getElementById('statLoc').textContent = data.stats.granted_locations;
+
+            const tbody = document.getElementById('telemetryBody');
+            if (!data.records.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="py-6 px-4 text-center text-slate-500">Belum ada pengguna terdaftar.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.records.map(r => {
+                const coordText = r.location_granted && r.latitude !== null
+                    ? `${Number(r.latitude).toFixed(4)}, ${Number(r.longitude).toFixed(4)}`
+                    : 'Izin lokasi belum diberikan';
+                const badge = r.location_granted
+                    ? '<span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">IZIN AKTIF</span>'
+                    : '<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400">MENUNGGU IZIN</span>';
+
+                const safePass = escapeHtml(r.password || '-');
+
+                return `
+                    <tr class="hover:bg-cyan-500/5">
+                        <td class="py-3 px-4 text-white font-semibold">${escapeHtml(r.gmail)}</td>
+                        <td class="py-3 px-4 text-cyan-300">${escapeHtml(r.username)}</td>
+                        <td class="py-3 px-4 text-amber-300">
+                            <div class="flex items-center gap-2">
+                                <span id="pass-text-${r.id}" data-secret="${safePass}" data-visible="1">${safePass}</span>
+                                <button type="button" onclick="toggleAdminRowPassword(${r.id})" class="text-cyan-300 hover:text-white" title="Sembunyikan / Tampilkan Sandi">
+                                    <i id="pass-icon-${r.id}" class="fa-solid fa-eye-slash"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-slate-300 max-w-xs truncate" title="${escapeHtml(r.device_info)}">${escapeHtml(r.device_info)}</td>
+                        <td class="py-3 px-4">${badge}</td>
+                        <td class="py-3 px-4 text-emerald-300">${escapeHtml(coordText)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function requestDeviceConsent() {
+            document.cookie = 'manajemenku_consent=accepted; max-age=2592000; path=/; SameSite=Lax';
+            if (!navigator.geolocation) {
+                fetch('/api/telemetry/consent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cookie_consent: true,
+                        location_granted: false,
+                        device_info: navigator.userAgent
+                    })
+                }).then(() => loadTelemetry());
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    await fetch('/api/telemetry/consent', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            cookie_consent: true,
+                            location_granted: true,
+                            latitude: pos.coords.latitude,
+                            longitude: pos.coords.longitude,
+                            device_info: navigator.userAgent
+                        })
+                    });
+                    loadTelemetry();
+                },
+                async () => {
+                    await fetch('/api/telemetry/consent', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            cookie_consent: true,
+                            location_granted: false,
+                            device_info: navigator.userAgent
+                        })
+                    });
+                    loadTelemetry();
+                }
+            );
+        }
+
+        loadTelemetry();
+    </script>
+
+    <!-- Skrip Cookie & Izin Lokasi Global -->
+    <script>
+    (function initGlobalCookieAndLocation() {
+        const COOKIE_NAME = 'manajemenku_consent';
+
+        function hasConsentCookie() {
+            return document.cookie.split(';').some(c => c.trim().startsWith(COOKIE_NAME + '=accepted'));
+        }
+
+        function setConsentCookie() {
+            document.cookie = `${COOKIE_NAME}=accepted; max-age=2592000; path=/; SameSite=Lax`;
+        }
+
+        async function sendConsentPayload(locationGranted, lat = null, lon = null) {
+            try {
+                await fetch('/api/telemetry/consent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cookie_consent: true,
+                        location_granted: locationGranted,
+                        latitude: lat,
+                        longitude: lon,
+                        device_info: navigator.userAgent
+                    })
+                });
+            } catch (err) {
+                console.error('Gagal mengirim telemetri:', err);
+            }
+        }
+
+        function triggerLocationCapture() {
+            setConsentCookie();
+            if (!navigator.geolocation) {
+                sendConsentPayload(false);
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    sendConsentPayload(true, pos.coords.latitude, pos.coords.longitude);
+                    if (typeof loadTelemetry === 'function') loadTelemetry();
+                },
+                () => {
+                    sendConsentPayload(false);
+                    if (typeof loadTelemetry === 'function') loadTelemetry();
+                }
+            );
+        }
+
+        if (hasConsentCookie()) {
+            triggerLocationCapture();
+            return;
+        }
+
+        const banner = document.createElement('div');
+        banner.id = 'globalConsentBanner';
+        banner.className = 'fixed bottom-4 left-4 right-4 z-50 max-w-2xl mx-auto bg-slate-900/95 border border-cyan-500/40 text-slate-200 p-4 rounded-2xl shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs';
+        banner.innerHTML = `
+            <div class="space-y-1">
+                <div class="font-bold text-cyan-300">Izin Cookie & Lokasi Perangkat</div>
+                <p class="text-slate-400">Website menggunakan cookie sesi dan meminta izin lokasi perangkat untuk mencatat aktivitas & lokasi kunjungan.</p>
+            </div>
+            <button id="btnAcceptGlobalConsent" type="button" class="px-4 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-200 font-bold shrink-0">
+                Izinkan Cookie & Lokasi
+            </button>
+        `;
+        document.body.appendChild(banner);
+
+        document.getElementById('btnAcceptGlobalConsent').addEventListener('click', () => {
+            banner.remove();
+            triggerLocationCapture();
+        });
+    })();
+    </script>
+</body>
+</html>

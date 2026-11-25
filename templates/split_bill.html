@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-72QBZPW7E6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-72QBZPW7E6');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemenku - Split Bill & Pajak Resto</title>
+    <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "yt1g68dq43");
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hidden {
+            display: none !important;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(rgba(11, 15, 25, 0.85), rgba(11, 15, 25, 0.90)), url("{{ url_for('static', filename='keuangan.jpeg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f3f4f6;
+        }
+        .glass-card {
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
+        }
+        .glass-input {
+            background: rgba(31, 41, 55, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+        .glass-input::placeholder { color: #9ca3af; }
+        .gradient-btn {
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            transition: 0.3s;
+        }
+        .gradient-btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <!-- Dashboard/Split Bill Screen -->
+    <div class="flex min-h-screen relative overflow-x-hidden">
+        <!-- Overlay Gelap saat Sidebar Terbuka -->
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+        <!-- SIDEBAR MENU UTAMA -->
+        <aside id="appSidebar" class="w-64 bg-[#0f172a] border-r border-gray-800 flex flex-col transition-all duration-300 ease-in-out fixed inset-y-0 left-0 z-50 -translate-x-full shadow-2xl">
+            <div class="p-5 border-b border-gray-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <a href="/" class="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-indigo-500/30 flex items-center justify-center bg-gray-900 hover:scale-105 transition">
+                        <img src="{{ url_for('static', filename='Manajemenku.png') }}" alt="Logo Manajemenku" class="w-full h-full object-cover">
+                    </a>
+                    <span class="font-extrabold text-base tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">MANAJEMENKU</span>
+                </div>
+                <!-- Tombol Tutup Sidebar -->
+                <button type="button" onclick="toggleSidebar()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <!-- DAFTAR MENU SIDEBAR -->
+            <div class="p-4 space-y-1 flex-1 text-sm font-medium">
+                <p class="text-[10px] uppercase text-gray-500 font-bold px-3 mb-2">Menu Utama</p>
+                <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition">
+                    <i class="fa-solid fa-chart-pie w-5"></i> Ringkasan Portfolio
+                </a>
+                <a href="/split-bill" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-indigo-400 bg-indigo-500/10 transition">
+                    <i class="fa-solid fa-receipt w-5"></i> Split Bill & Pajak
+                </a>
+                <a href="/hutang-piutang" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition">
+                    <i class="fa-solid fa-handshake-angle w-5"></i> Hutang Piutang
+                </a>
+                <a href="/tentang-kami" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition">
+                    <i class="fa-solid fa-circle-info w-5"></i> Tentang Kami
+                </a>
+
+                <div class="pt-4">
+                    <p class="text-[10px] uppercase text-gray-500 font-bold px-3 mb-2">Keanggotaan</p>
+                    <div id="sidebarUpgradeContainer">
+                        <button type="button" onclick="openPremiumModal()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 transition text-sm font-semibold border border-amber-500/30">
+                            <i class="fa-solid fa-crown w-5"></i> Upgrade ke Premium
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOMBOL KELUAR DI BAWAH SIDEBAR -->
+            <div class="p-4 border-t border-gray-800">
+                <button type="button" onclick="handleLogout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-rose-400 hover:bg-rose-500/10 transition text-sm font-semibold">
+                    <i class="fa-solid fa-right-from-bracket w-5"></i> Keluar
+                </button>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA DI SEBELAH KANAN -->
+        <div id="mainContent" class="flex-1 flex flex-col w-full transition-all duration-300">
+            <header class="border-b border-gray-800 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-40 h-16 flex items-center px-4 sm:px-8 justify-between">
+                <div class="flex items-center gap-4">
+                    <!-- Tombol Garis Tiga (Hamburger Menu) -->
+                    <button type="button" onclick="toggleSidebar()" class="w-10 h-10 rounded-xl border border-gray-700 bg-gray-800/80 hover:bg-indigo-600/20 text-gray-300 hover:text-indigo-400 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-md">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <span class="font-extrabold text-lg text-white hidden sm:inline">Kalkulator Split Bill</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <a href="/" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-2 bg-indigo-500/10 px-3 py-2 rounded-xl border border-indigo-500/20 transition">
+                        <i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard
+                    </a>
+                </div>
+            </header>
+
+            <div class="p-4 sm:p-8 pt-8 space-y-8 w-full max-w-7xl mx-auto">
+                <!-- KARTU UTAMA SPLIT BILL -->
+                <div class="glass-card p-6 sm:p-8 space-y-6">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-gray-800 pb-6">
+                        <div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-lg border border-indigo-500/20">
+                                    <i class="fa-solid fa-receipt"></i>
+                                </div>
+                                <h1 class="text-xl font-extrabold text-white">Kalkulator Split Bill & Pajak Resto</h1>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Bagi tagihan makan & nongkrong bareng teman secara adil lengkap dengan pajak PB1 & service.</p>
+                        </div>
+
+                        <!-- Pilihan Mode Hitung & Reset -->
+                        <div class="flex items-center gap-3 flex-wrap">
+                            <div class="bg-gray-900 p-1.5 rounded-xl border border-gray-800 flex items-center">
+                                <button type="button" id="btnModeMenu" onclick="setMode('menu')" class="px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition shadow-md">Bagi per Menu</button>
+                                <button type="button" id="btnModeEqual" onclick="setMode('equal')" class="px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition">Bagi Rata</button>
+                            </div>
+                            <button type="button" onclick="resetBill()" class="text-xs bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 px-4 py-2.5 rounded-xl font-semibold transition flex items-center gap-2">
+                                <i class="fa-solid fa-rotate-right"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Nama Acara -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Nama Acara / Restoran</label>
+                        <input type="text" id="eventName" placeholder="Contoh: Makan Siang Resto Bebek..." class="w-full glass-input p-3 rounded-xl text-sm">
+                    </div>
+
+                    <!-- Layout Utama 2 Kolom -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                        <!-- Kolom Kiri: Input Peserta & Menu / Bagi Rata -->
+                        <div class="lg:col-span-2 space-y-6">
+
+                            <!-- Peserta Patungan -->
+                            <div class="glass-card p-5 space-y-3 bg-gray-900/50">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-users mr-2 text-indigo-400"></i>Peserta Patungan (<span id="participantCount">1</span>)</h3>
+                                </div>
+                                <div class="flex gap-2">
+                                    <input type="text" id="participantInput" placeholder="Ketik nama teman (cth: Sarah, Rian)..." class="w-full glass-input p-3 rounded-xl text-sm" onkeypress="if(event.key === 'Enter') { event.preventDefault(); addParticipant(); }">
+                                    <button type="button" onclick="addParticipant()" class="gradient-btn px-5 py-3 rounded-xl font-semibold text-white text-sm shrink-0">+ Tambah</button>
+                                </div>
+                                <div id="participantList" class="flex flex-wrap gap-2 pt-1">
+                                    <span class="px-3 py-1.5 rounded-xl bg-gray-800 text-gray-300 text-xs font-medium border border-gray-700 flex items-center gap-2">
+                                        Saya <span class="text-[10px] text-gray-500">(Anda)</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- SECTION A: MODE BAGI RATA (Hidden secara default jika mode menu) -->
+                            <div id="sectionEqual" class="glass-card p-5 space-y-4 bg-gray-900/50 hidden">
+                                <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-calculator mr-2 text-indigo-400"></i>Total Tagihan Kasir (Bagi Rata)</h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-300 mb-1">Total Tagihan Kasir (Rp)</label>
+                                        <input type="number" id="equalTotalAmount" min="0" placeholder="Contoh: 150000" class="w-full glass-input p-3 rounded-xl text-sm" oninput="calculateSplit()">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-300 mb-1">Jumlah Orang Patungan</label>
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" onclick="adjustEqualPeople(-1)" class="w-10 h-[46px] bg-gray-800 border border-gray-700 rounded-xl font-bold text-white hover:bg-gray-700">-</button>
+                                            <input type="number" id="equalPeopleCount" min="1" value="1" class="w-full glass-input p-3 rounded-xl text-sm text-center" oninput="calculateSplit()">
+                                            <button type="button" onclick="adjustEqualPeople(1)" class="w-10 h-[46px] bg-gray-800 border border-gray-700 rounded-xl font-bold text-white hover:bg-gray-700">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION B: MODE BAGI PER MENU (Default) -->
+                            <div id="sectionMenu" class="glass-card p-5 space-y-4 bg-gray-900/50">
+                                <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                                    <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-utensils mr-2 text-indigo-400"></i>Daftar Menu / Pesanan</h3>
+                                    <span id="menuSubtotalBadge" class="text-xs font-semibold text-gray-400">Subtotal: Rp 0</span>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-300 mb-1">Nama Makanan / Minuman</label>
+                                        <input type="text" id="menuName" placeholder="Cth: Ayam Bakar / Es Teh..." class="w-full glass-input p-3 rounded-xl text-sm">
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-300 mb-1">Harga Satuan (Rp)</label>
+                                            <input type="number" id="menuPrice" min="0" placeholder="Cth: 25000" class="w-full glass-input p-3 rounded-xl text-sm">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-gray-300 mb-1">Jumlah Porsi</label>
+                                            <div class="flex items-center gap-2">
+                                                <button type="button" onclick="adjustQty(-1)" class="w-10 h-[46px] bg-gray-800 border border-gray-700 rounded-xl font-bold text-white hover:bg-gray-700">-</button>
+                                                <input type="number" id="menuQty" min="1" value="1" class="w-full glass-input p-3 rounded-xl text-sm text-center">
+                                                <button type="button" onclick="adjustQty(1)" class="w-10 h-[46px] bg-gray-800 border border-gray-700 rounded-xl font-bold text-white hover:bg-gray-700">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-gray-300 mb-1">Siapa yang Makan / Pesan Item Ini?</label>
+                                        <select id="menuBuyer" class="w-full glass-input p-3 rounded-xl text-sm">
+                                            <option value="Saya">Saya</option>
+                                        </select>
+                                    </div>
+                                    <button type="button" onclick="addMenu()" class="w-full gradient-btn py-3 rounded-xl font-bold text-white text-sm shadow-lg">Tambahkan ke Daftar Menu</button>
+                                </div>
+
+                                <!-- List Item Pesanan Masuk -->
+                                <div id="menuItemsContainer" class="space-y-2 pt-2">
+                                    <p class="text-xs text-gray-500 text-center py-4">Belum ada menu ditambahkan.</p>
+                                </div>
+                            </div>
+
+                            <!-- PENGATURAN PAJAK, SERVICE, DISKON & ONGKIR -->
+                            <div class="glass-card p-5 space-y-4 bg-gray-900/50">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-percent mr-2 text-indigo-400"></i>Pajak Resto, Service, Diskon & Ongkir</h3>
+                                    <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-full font-semibold border border-emerald-500/30">Aktif</span>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <!-- Diskon -->
+                                    <div class="glass-card p-3.5 bg-gray-950/40 space-y-2">
+                                        <label class="block text-xs font-semibold text-gray-300">Diskon / Promo Voucher</label>
+                                        <input type="number" id="discountVal" min="0" value="0" placeholder="0" class="w-full glass-input p-2.5 rounded-xl text-sm" oninput="calculateSplit()">
+                                    </div>
+                                    <!-- Pajak Resto -->
+                                    <div class="glass-card p-3.5 bg-gray-950/40 space-y-2">
+                                        <label class="block text-xs font-semibold text-gray-300">Pajak Resto (PB1 / PPN %)</label>
+                                        <div class="flex gap-1.5">
+                                            <button type="button" onclick="setTax(0)" id="taxBtn0" class="flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition">0%</button>
+                                            <button type="button" onclick="setTax(10)" id="taxBtn10" class="flex-1 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition">10%</button>
+                                            <button type="button" onclick="setTax(11)" id="taxBtn11" class="flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition">11%</button>
+                                            <button type="button" onclick="setTax(12)" id="taxBtn12" class="flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition">12%</button>
+                                        </div>
+                                        <input type="number" id="taxCustom" min="0" value="10" placeholder="10" class="w-full glass-input p-2 rounded-xl text-xs" oninput="customTaxChanged()">
+                                    </div>
+                                    <!-- Service Charge -->
+                                    <div class="glass-card p-3.5 bg-gray-950/40 space-y-2">
+                                        <label class="block text-xs font-semibold text-gray-300">Service Charge (%)</label>
+                                        <div class="flex gap-1.5">
+                                            <button type="button" onclick="setService(0)" id="srvBtn0" class="flex-1 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition">0%</button>
+                                            <button type="button" onclick="setService(5)" id="srvBtn5" class="flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition">5%</button>
+                                            <button type="button" onclick="setService(7)" id="srvBtn7" class="flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition">7%</button>
+                                            <button type="button" onclick="setService(10)" id="srvBtn10" class="flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition">10%</button>
+                                        </div>
+                                        <input type="number" id="serviceCustom" min="0" value="0" placeholder="0" class="w-full glass-input p-2 rounded-xl text-xs" oninput="calculateSplit()">
+                                    </div>
+                                    <!-- Biaya Lain / Ongkir -->
+                                    <div class="glass-card p-3.5 bg-gray-950/40 space-y-2">
+                                        <label class="block text-xs font-semibold text-gray-300">Biaya Lain / Ongkir (Rp)</label>
+                                        <input type="number" id="shippingVal" min="0" value="0" placeholder="0" class="w-full glass-input p-2.5 rounded-xl text-sm" oninput="calculateSplit()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kolom Kanan: Ringkasan Total & Tombol WhatsApp -->
+                        <div class="space-y-6">
+
+                            <!-- Ringkasan Total Tagihan -->
+                            <div class="glass-card p-5 space-y-4 bg-gray-900/50 sticky top-20">
+                                <h3 class="text-sm font-bold text-white border-b border-gray-800 pb-3">Ringkasan Total Tagihan</h3>
+
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex justify-between text-gray-400">
+                                        <span>Subtotal Pesanan</span>
+                                        <span id="summarySubtotal" class="text-white font-semibold">Rp 0</span>
+                                    </div>
+                                    <div class="flex justify-between text-gray-400">
+                                        <span>Diskon / Voucher</span>
+                                        <span id="summaryDiscount" class="text-emerald-400 font-semibold">- Rp 0</span>
+                                    </div>
+                                    <div class="flex justify-between text-gray-400">
+                                        <span>Pajak & Service</span>
+                                        <span id="summaryTaxService" class="text-white font-semibold">+ Rp 0</span>
+                                    </div>
+                                    <div class="flex justify-between text-gray-400">
+                                        <span>Biaya Lain / Ongkir</span>
+                                        <span id="summaryShipping" class="text-white font-semibold">+ Rp 0</span>
+                                    </div>
+                                    <div class="border-t border-gray-800 pt-3 flex justify-between text-sm font-bold text-white">
+                                        <span>Total Tagihan Akhir</span>
+                                        <span id="summaryGrandTotal" class="text-indigo-400 text-lg">Rp 0</span>
+                                    </div>
+                                </div>
+
+                                <!-- Tombol Salin ke WhatsApp -->
+                                <button type="button" onclick="sendToWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-500 py-3.5 rounded-xl font-bold text-white text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition hover:scale-[1.02]">
+                                    <i class="fa-brands fa-whatsapp text-lg"></i> Salin Rekap ke WhatsApp
+                                </button>
+
+                                <div class="pt-3 border-t border-gray-800 space-y-3">
+                                    <h4 class="text-xs font-bold text-white">Rincian Tagihan Per Orang</h4>
+                                    <div id="perPersonBreakdown" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                                        <p class="text-xs text-gray-500 text-center py-2">Belum ada rincian.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pembayaran QRIS / Upgrade Premium -->
+    <div id="modalPremium" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="glass-card p-6 w-full max-w-sm border border-indigo-500/30 shadow-2xl relative text-center space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="text-base font-bold text-white">Upgrade Akun Premium</h3>
+                <button type="button" onclick="closePremiumModal()" class="text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-gray-400">Scan QR Code di bawah menggunakan m-Banking atau E-Wallet untuk pembayaran sebesar <b class="text-indigo-400">Rp 25.000</b></p>
+
+            <!-- Gambar Simulasi QR Code -->
+            <div class="bg-white p-4 rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-inner border border-gray-300">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=MANAJEMENKU_PREMIUM_UPGRADE_25000" alt="QRIS QR Code" class="w-full h-full object-contain">
+            </div>
+
+            <div class="space-y-2 pt-2">
+                <button type="button" onclick="simulatePaymentSuccess()" class="w-full gradient-btn py-2.5 rounded-xl font-bold text-white text-xs shadow-lg">
+                    <i class="fa-solid fa-check-circle mr-1"></i> Simulasi Pembayaran Berhasil
+                </button>
+                <p class="text-[10px] text-gray-500">QRIS Standar Nasional Indonesia - PT Manajemenku</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 border-t border-gray-800 bg-gray-950/80 py-10 text-gray-400">
+        <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-sm">
+            <div class="space-y-3">
+                <h4 class="text-white font-bold text-lg tracking-wide">MANAJEMENKU</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">
+                    Platform Smart Finance System yang dirancang secara presisi untuk membantu pengelolaan keuangan harian, analisis arus kas, serta pemantauan transaksi secara terintegrasi dan efisien.
+                </p>
+            </div>
+            <div class="space-y-3">
+                <h4 class="text-white font-semibold text-sm uppercase tracking-wider">Tim Pengembang</h4>
+                <ul class="space-y-1.5 text-xs">
+                    <li><span class="text-gray-300">M. Nazar Habib. A</span> — <span class="text-gray-300">Lead Web Developer</span></li>
+                    <li><span class="text-gray-300">Salsabila Lilanti</span></li>
+                    <li><span class="text-gray-300">Manggala Satrio Wijoyo</span></li>
+                    <li><span class="text-gray-300">M. Iman Nur Ikhfarel Al Hakim</span></li>
+                </ul>
+            </div>
+            <div class="space-y-3">
+                <h4 class="text-white font-semibold text-sm uppercase tracking-wider">Afiliasi Industri & Akademis</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">
+                    Dikembangkan oleh mahasiswa <span class="text-gray-400">Prodi Teknologi Informasi</span>, Fakultas Teknik & Informatika — <strong class="text-gray-200">Universitas Bina Sarana Informatika (UBSI)</strong>.
+                </p>
+            </div>
+        </div>
+        <div class="border-t border-gray-800/60 pt-8 pb-4 text-center text-xs space-y-4 max-w-6xl mx-auto flex flex-col items-center justify-center">
+            <div class="flex items-center justify-center gap-6 sm:gap-10">
+                <img src="{{ url_for('static', filename='logo-ubsi.png') }}" alt="Logo UBSI" class="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-2xl">
+                <img src="{{ url_for('static', filename='logo-lembaga.png') }}" alt="Logo Lembaga Manajemenku" class="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-2xl">
+            </div>
+
+            <p class="text-gray-300 font-medium text-xs sm:text-sm max-w-md px-4 pt-2">
+                Terima kasih telah mengunjungi platform resmi yang dikelola oleh tim kami.
+            </p>
+
+            <p class="text-gray-500 pt-2 border-t border-gray-800/40 w-full">
+                © 2026 PT Manajemenku Teknologi Indonesia & UBSI Team. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 right-4 z-50 bg-slate-900 border border-indigo-500/40 text-white px-4 py-3 rounded-xl shadow-xl text-xs font-semibold transition-opacity duration-300';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('appSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const mainContent = document.getElementById('mainContent');
+
+            const isOpen = !sidebar.classList.contains('-translate-x-full');
+
+            if (isOpen) {
+                sidebar.classList.add('-translate-x-full');
+                if (overlay) {
+                    overlay.classList.add('opacity-0', 'pointer-events-none');
+                    overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                }
+                if (window.innerWidth >= 768) {
+                    mainContent.classList.remove('md:pl-64');
+                }
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                if (overlay) {
+                    overlay.classList.remove('opacity-0', 'pointer-events-none');
+                    overlay.classList.add('opacity-100', 'pointer-events-auto');
+                }
+                if (window.innerWidth >= 768) {
+                    mainContent.classList.add('md:pl-64');
+                }
+            }
+        }
+
+        async function handleLogout() {
+            const res = await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
+            if(res.ok) { window.location.href = '/'; }
+        }
+
+        function openPremiumModal() {
+            document.getElementById('modalPremium').classList.remove('hidden');
+        }
+
+        function closePremiumModal() {
+            document.getElementById('modalPremium').classList.add('hidden');
+        }
+
+        async function simulatePaymentSuccess() {
+            const res = await fetch('/api/upgrade-to-premium', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.success) {
+                showToast(data.message || 'Status akun berhasil diupgrade ke Premium.');
+                closePremiumModal();
+                checkPremiumSidebar();
+            }
+        }
+
+        async function checkPremiumSidebar() {
+            const container = document.getElementById('sidebarUpgradeContainer');
+            if (!container) return;
+            try {
+                const res = await fetch('/api/user-data', { credentials: 'same-origin' });
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.user && data.user.is_premium) {
+                    container.innerHTML = `
+                        <div class="px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center gap-2 text-xs font-bold">
+                            <i class="fa-solid fa-crown"></i> Akun VIP Premium
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error('Gagal memeriksa status premium:', err);
+            }
+        }
+
+        // --- LOGIKA SPLIT BILL ---
+        let currentMode = 'menu';
+        let participants = ["Saya"];
+        let menus = [];
+        let taxRate = 10;
+        let serviceRate = 0;
+
+        function setMode(mode) {
+            currentMode = mode;
+            const btnMenu = document.getElementById('btnModeMenu');
+            const btnEqual = document.getElementById('btnModeEqual');
+            const secMenu = document.getElementById('sectionMenu');
+            const secEqual = document.getElementById('sectionEqual');
+
+            if(mode === 'menu') {
+                btnMenu.className = "px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition shadow-md";
+                btnEqual.className = "px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition";
+                secMenu.classList.remove('hidden');
+                secEqual.classList.add('hidden');
+            } else {
+                btnEqual.className = "px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition shadow-md";
+                btnMenu.className = "px-4 py-2 rounded-lg text-xs font-semibold text-gray-400 hover:text-white transition";
+                secEqual.classList.remove('hidden');
+                secMenu.classList.add('hidden');
+            }
+            calculateSplit();
+        }
+
+        function addParticipant() {
+            const input = document.getElementById('participantInput');
+            const name = input.value.trim();
+            if(name && !participants.includes(name)) {
+                participants.push(name);
+                input.value = '';
+                renderParticipants();
+                calculateSplit();
+            }
+        }
+
+        function removeParticipant(name) {
+            if(name === "Saya") return;
+            participants = participants.filter(p => p !== name);
+            menus = menus.map(m => m.buyer === name ? { ...m, buyer: "Saya" } : m);
+            renderParticipants();
+            renderMenus();
+            calculateSplit();
+        }
+
+        function renderParticipants() {
+            const listEl = document.getElementById('participantList');
+            const buyerSelect = document.getElementById('menuBuyer');
+            listEl.innerHTML = '';
+            buyerSelect.innerHTML = '';
+
+            document.getElementById('participantCount').textContent = participants.length;
+            document.getElementById('equalPeopleCount').value = participants.length;
+
+            participants.forEach(p => {
+                const safeName = escapeHtml(p);
+                const encodedName = encodeURIComponent(p);
+                listEl.innerHTML += `
+                    <span class="px-3 py-1.5 rounded-xl bg-gray-800 text-gray-300 text-xs font-medium border border-gray-700 flex items-center gap-2">
+                        ${safeName} ${p !== 'Saya' ? `<button type="button" onclick="removeParticipant(decodeURIComponent('${encodedName}'))" class="text-gray-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>` : '<span class="text-[10px] text-gray-500">(Anda)</span>'}
+                    </span>
+                `;
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                buyerSelect.appendChild(opt);
+            });
+        }
+
+        function adjustQty(amount) {
+            const qtyInput = document.getElementById('menuQty');
+            let val = parseInt(qtyInput.value) || 1;
+            val = Math.max(1, val + amount);
+            qtyInput.value = val;
+        }
+
+        function adjustEqualPeople(amount) {
+            const countInput = document.getElementById('equalPeopleCount');
+            let val = parseInt(countInput.value) || 1;
+            val = Math.max(1, val + amount);
+            countInput.value = val;
+            calculateSplit();
+        }
+
+        function addMenu() {
+            const name = document.getElementById('menuName').value.trim();
+            const price = parseFloat(document.getElementById('menuPrice').value);
+            const qty = parseInt(document.getElementById('menuQty').value) || 1;
+            const buyer = document.getElementById('menuBuyer').value;
+
+            if(name && !isNaN(price) && price >= 0) {
+                menus.push({ id: Date.now(), name, price, qty, buyer });
+                document.getElementById('menuName').value = '';
+                document.getElementById('menuPrice').value = '';
+                document.getElementById('menuQty').value = 1;
+                renderMenus();
+                calculateSplit();
+            } else {
+                showToast("Mohon masukkan nama menu dan harga yang valid.");
+            }
+        }
+
+        function removeMenu(id) {
+            const safeId = Number(id);
+            if (!Number.isFinite(safeId)) return;
+            menus = menus.filter(m => m.id !== safeId);
+            renderMenus();
+            calculateSplit();
+        }
+
+        function renderMenus() {
+            const container = document.getElementById('menuItemsContainer');
+            container.innerHTML = '';
+
+            if(menus.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Belum ada menu ditambahkan.</p>`;
+                return;
+            }
+
+            menus.forEach(m => {
+                const totalItemPrice = m.price * m.qty;
+                const safeId = Number(m.id);
+                container.innerHTML += `
+                    <div class="flex justify-between items-center bg-gray-950/40 p-3 rounded-xl border border-gray-800">
+                        <div>
+                            <div class="text-xs font-bold text-white">${m.qty}x ${escapeHtml(m.name)} <span class="text-indigo-400 font-normal">(@Rp ${m.price.toLocaleString('id-ID')})</span></div>
+                            <div class="text-[11px] text-gray-400">Pesan oleh: <span class="text-emerald-400 font-medium">${escapeHtml(m.buyer)}</span> • Total: Rp ${totalItemPrice.toLocaleString('id-ID')}</div>
+                        </div>
+                        <button type="button" onclick="removeMenu(${safeId})" class="text-gray-500 hover:text-rose-400 p-2"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    </div>
+                `;
+            });
+        }
+
+        function setTax(val) {
+            taxRate = val;
+            document.getElementById('taxCustom').value = val;
+            for(let i of [0, 10, 11, 12]) {
+                const btn = document.getElementById('taxBtn' + i);
+                if(btn) {
+                    if(i === val) btn.className = "flex-1 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition";
+                    else btn.className = "flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition";
+                }
+            }
+            calculateSplit();
+        }
+
+        function customTaxChanged() {
+            taxRate = parseFloat(document.getElementById('taxCustom').value) || 0;
+            calculateSplit();
+        }
+
+        function setService(val) {
+            serviceRate = val;
+            document.getElementById('serviceCustom').value = val;
+            for(let i of [0, 5, 7, 10]) {
+                const btn = document.getElementById('srvBtn' + i);
+                if(btn) {
+                    if(i === val) btn.className = "flex-1 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition";
+                    else btn.className = "flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-300 hover:bg-gray-700 transition";
+                }
+            }
+            calculateSplit();
+        }
+
+        let breakdownResults = {};
+
+        function calculateSplit() {
+            let subtotal = 0;
+            let discount = parseFloat(document.getElementById('discountVal').value) || 0;
+            let customServiceVal = parseFloat(document.getElementById('serviceCustom').value) || 0;
+            let shipping = parseFloat(document.getElementById('shippingVal').value) || 0;
+
+            if(currentMode === 'menu') {
+                subtotal = menus.reduce((acc, m) => acc + (m.price * m.qty), 0);
+            } else {
+                subtotal = parseFloat(document.getElementById('equalTotalAmount').value) || 0;
+            }
+
+            document.getElementById('menuSubtotalBadge').textContent = 'Subtotal: Rp ' + subtotal.toLocaleString('id-ID');
+
+            let effectiveSubtotal = Math.max(0, subtotal - discount);
+            let taxAmount = effectiveSubtotal * (taxRate / 100);
+            let serviceAmount = effectiveSubtotal * (customServiceVal / 100);
+            let totalTaxService = taxAmount + serviceAmount;
+            let grandTotal = effectiveSubtotal + totalTaxService + shipping;
+
+            document.getElementById('summarySubtotal').textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
+            document.getElementById('summaryDiscount').textContent = '- Rp ' + discount.toLocaleString('id-ID');
+            document.getElementById('summaryTaxService').textContent = '+ Rp ' + totalTaxService.toLocaleString('id-ID');
+            document.getElementById('summaryShipping').textContent = '+ Rp ' + shipping.toLocaleString('id-ID');
+            document.getElementById('summaryGrandTotal').textContent = 'Rp ' + grandTotal.toLocaleString('id-ID');
+
+            breakdownResults = {};
+            participants.forEach(p => breakdownResults[p] = 0);
+
+            if(currentMode === 'menu') {
+                menus.forEach(m => {
+                    if(breakdownResults[m.buyer] !== undefined) {
+                        breakdownResults[m.buyer] += (m.price * m.qty);
+                    }
+                });
+
+                let breakdownContainer = document.getElementById('perPersonBreakdown');
+                breakdownContainer.innerHTML = '';
+
+                let totalPersonSub = Object.values(breakdownResults).reduce((a,b)=>a+b, 0);
+
+                participants.forEach(p => {
+                    let pSub = breakdownResults[p] || 0;
+                    let pDiscountShare = totalPersonSub > 0 ? (pSub / totalPersonSub) * discount : 0;
+                    let pNetSub = Math.max(0, pSub - pDiscountShare);
+                    let pTaxShare = pNetSub * (taxRate / 100);
+                    let pSrvShare = pNetSub * (customServiceVal / 100);
+                    let pShipShare = participants.length > 0 ? shipping / participants.length : 0;
+
+                    let pTotal = pNetSub + pTaxShare + pSrvShare + pShipShare;
+                    breakdownResults[p] = Math.round(pTotal);
+
+                    breakdownContainer.innerHTML += `
+                        <div class="flex justify-between items-center bg-gray-950/40 p-2.5 rounded-xl border border-gray-800 text-xs">
+                            <span class="font-semibold text-white">${escapeHtml(p)}</span>
+                            <span class="text-indigo-400 font-bold">Rp ${Math.round(pTotal).toLocaleString('id-ID')}</span>
+                        </div>
+                    `;
+                });
+            } else {
+                let count = parseInt(document.getElementById('equalPeopleCount').value) || participants.length;
+                count = Math.max(1, count);
+                let sharePerPerson = grandTotal / count;
+
+                let breakdownContainer = document.getElementById('perPersonBreakdown');
+                breakdownContainer.innerHTML = '';
+
+                participants.forEach(p => {
+                    breakdownResults[p] = Math.round(sharePerPerson);
+                    breakdownContainer.innerHTML += `
+                        <div class="flex justify-between items-center bg-gray-950/40 p-2.5 rounded-xl border border-gray-800 text-xs">
+                            <span class="font-semibold text-white">${escapeHtml(p)}</span>
+                            <span class="text-indigo-400 font-bold">Rp ${Math.round(sharePerPerson).toLocaleString('id-ID')}</span>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function resetBill() {
+            menus = [];
+            participants = ["Saya"];
+            document.getElementById('eventName').value = '';
+            document.getElementById('discountVal').value = 0;
+            document.getElementById('shippingVal').value = 0;
+            document.getElementById('equalTotalAmount').value = '';
+            renderParticipants();
+            renderMenus();
+            calculateSplit();
+        }
+
+        function sendToWhatsApp() {
+            const eventName = document.getElementById('eventName').value.trim() || "Makan Bareng";
+            let subtotal = 0;
+            if(currentMode === 'menu') {
+                subtotal = menus.reduce((acc, m) => acc + (m.price * m.qty), 0);
+            } else {
+                subtotal = parseFloat(document.getElementById('equalTotalAmount').value) || 0;
+            }
+            let discount = parseFloat(document.getElementById('discountVal').value) || 0;
+            let customServiceVal = parseFloat(document.getElementById('serviceCustom').value) || 0;
+            let shipping = parseFloat(document.getElementById('shippingVal').value) || 0;
+
+            let effectiveSubtotal = Math.max(0, subtotal - discount);
+            let taxAmount = effectiveSubtotal * (taxRate / 100);
+            let serviceAmount = effectiveSubtotal * (customServiceVal / 100);
+            let grandTotal = effectiveSubtotal + taxAmount + serviceAmount + shipping;
+
+            let text = `🧾 *STRUK SPLIT BILL & TAGIHAN* 🧾\n`;
+            text += `🏢 *MANAJEMENKU Smart Finance*\n`;
+            text += `━━━━━━━━━━━━━━━━━━━━━\n`;
+            text += `📌 *Acara:* ${eventName}\n`;
+            text += `📅 *Waktu:* ${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}\n`;
+            text += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+            if(currentMode === 'menu' && menus.length > 0) {
+                text += `📋 *Daftar Pesanan:*\n`;
+                menus.forEach((m, idx) => {
+                    text += `${idx+1}. ${m.name} (${m.qty}x) - Rp ${(m.price * m.qty).toLocaleString('id-ID')} _(${m.buyer})_\n`;
+                });
+                text += `\n`;
+            }
+
+            text += `💰 *Ringkasan Biaya:*\n`;
+            text += `• Subtotal: Rp ${subtotal.toLocaleString('id-ID')}\n`;
+            if(discount > 0) text += `• Diskon: -Rp ${discount.toLocaleString('id-ID')}\n`;
+            if(taxRate > 0) text += `• Pajak (${taxRate}%): +Rp ${taxAmount.toLocaleString('id-ID')}\n`;
+            if(customServiceVal > 0) text += `• Service (${customServiceVal}%): +Rp ${serviceAmount.toLocaleString('id-ID')}\n`;
+            if(shipping > 0) text += `• Ongkir/Biaya Lain: +Rp ${shipping.toLocaleString('id-ID')}\n`;
+            text += `🔹 *TOTAL AKHIR: Rp ${grandTotal.toLocaleString('id-ID')}*\n`;
+            text += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+
+            text += `👥 *Rincian Bayar Per Orang:*\n`;
+            participants.forEach(p => {
+                let pCost = breakdownResults[p] || 0;
+                text += `👤 *${p}*: *Rp ${pCost.toLocaleString('id-ID')}*\n`;
+            });
+
+            text += `\n✨ _Dihitung secara otomatis melalui platform resmi MANAJEMENKU_`;
+
+            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast("Rekap disalin ke clipboard. Membuka WhatsApp...");
+                    window.open(waUrl, '_blank', 'noopener,noreferrer');
+                }).catch(() => {
+                    window.open(waUrl, '_blank', 'noopener,noreferrer');
+                });
+            } else {
+                window.open(waUrl, '_blank', 'noopener,noreferrer');
+            }
+        }
+
+        calculateSplit();
+        checkPremiumSidebar();
+    </script>
+
+    <!-- Skrip Cookie & Izin Lokasi Global -->
+    <script>
+    (function initGlobalCookieAndLocation() {
+        const COOKIE_NAME = 'manajemenku_consent';
+
+        function hasConsentCookie() {
+            return document.cookie.split(';').some(c => c.trim().startsWith(COOKIE_NAME + '=accepted'));
+        }
+
+        function setConsentCookie() {
+            document.cookie = `${COOKIE_NAME}=accepted; max-age=2592000; path=/; SameSite=Lax`;
+        }
+
+        async function sendConsentPayload(locationGranted, lat = null, lon = null) {
+            try {
+                await fetch('/api/telemetry/consent', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cookie_consent: true,
+                        location_granted: locationGranted,
+                        latitude: lat,
+                        longitude: lon,
+                        device_info: navigator.userAgent
+                    })
+                });
+            } catch (err) {
+                console.error('Gagal mengirim telemetri:', err);
+            }
+        }
+
+        function triggerLocationCapture() {
+            setConsentCookie();
+            if (!navigator.geolocation) {
+                sendConsentPayload(false);
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (pos) => sendConsentPayload(true, pos.coords.latitude, pos.coords.longitude),
+                () => sendConsentPayload(false)
+            );
+        }
+
+        if (hasConsentCookie()) {
+            triggerLocationCapture();
+            return;
+        }
+
+        const banner = document.createElement('div');
+        banner.id = 'globalConsentBanner';
+        banner.className = 'fixed bottom-4 left-4 right-4 z-50 max-w-2xl mx-auto bg-slate-900/95 border border-cyan-500/40 text-slate-200 p-4 rounded-2xl shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs';
+        banner.innerHTML = `
+            <div class="space-y-1">
+                <div class="font-bold text-cyan-300">Izin Cookie & Lokasi Perangkat</div>
+                <p class="text-slate-400">Website menggunakan cookie sesi dan meminta izin lokasi perangkat untuk mencatat aktivitas & lokasi kunjungan.</p>
+            </div>
+            <button id="btnAcceptGlobalConsent" type="button" class="px-4 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-200 font-bold shrink-0">
+                Izinkan Cookie & Lokasi
+            </button>
+        `;
+        document.body.appendChild(banner);
+
+        document.getElementById('btnAcceptGlobalConsent').addEventListener('click', () => {
+            banner.remove();
+            triggerLocationCapture();
+        });
+    })();
+    </script>
+</body>
+</html>

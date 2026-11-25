@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-72QBZPW7E6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-72QBZPW7E6');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemenku - Masuk / Daftar</title>
+    <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "yt1g68dq43");
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(rgba(11, 15, 25, 0.85), rgba(11, 15, 25, 0.90)), url("{{ url_for('static', filename='keuangan.jpeg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f3f4f6;
+        }
+        .glass-card {
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
+        }
+        .glass-input {
+            background: rgba(31, 41, 55, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+        .glass-input::placeholder { color: #9ca3af; }
+        .gradient-btn {
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            transition: 0.3s;
+        }
+        .gradient-btn:hover { opacity: 0.9; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+</head>
+<body class="min-h-screen flex flex-col justify-between pt-8">
+
+    <!-- Area Kartu Form Login / Register -->
+    <div class="flex-1 flex items-center justify-center p-4">
+        <div class="glass-card tilt-card p-8 w-full max-w-md border border-gray-800 shadow-2xl space-y-6" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2">
+            <div class="flex flex-col items-center justify-center text-center space-y-3">
+                <img src="{{ url_for('static', filename='Manajemenku.png') }}" alt="Manajemenku" class="w-20 h-20 object-contain">
+                <div class="space-y-1">
+                    <h1 class="text-2xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">MANAJEMENKU</h1>
+                    <p class="text-xs text-gray-400">Aplikasi Pengelolaan Keuangan</p>
+                </div>
+            </div>
+
+            <div id="authAlert" class="hidden p-3 rounded-xl text-xs text-center font-medium"></div>
+
+            <div class="flex border-b border-gray-800 text-sm font-semibold">
+                <button type="button" onclick="switchTab('login')" id="tabLogin" class="w-1/2 py-2 text-indigo-400 border-b-2 border-indigo-500">Masuk</button>
+                <button type="button" onclick="switchTab('register')" id="tabRegister" class="w-1/2 py-2 text-gray-500 hover:text-gray-300">Daftar Akun</button>
+            </div>
+
+            <!-- Form Login -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div class="min-w-0">
+                    <label for="loginUsername" class="block text-xs font-semibold text-gray-300 mb-1">Username</label>
+                    <input type="text" id="loginUsername" required placeholder="Masukkan username" class="w-full glass-input p-3 rounded-xl text-sm">
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center justify-between mb-1">
+                        <label for="loginPassword" class="block text-xs font-semibold text-gray-300">Password</label>
+                        <a href="/forgot-password" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition">Lupa Password?</a>
+                    </div>
+                    <div class="relative">
+                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full glass-input p-3 pr-10 rounded-xl text-sm">
+                        <button type="button" onclick="togglePasswordVisibility('loginPassword', 'iconLoginPass')" aria-label="Tampilkan atau sembunyikan password" class="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-white flex items-center">
+                            <i id="iconLoginPass" class="fa-solid fa-eye text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="w-full gradient-btn py-3 rounded-xl font-bold text-white text-sm shadow-lg">Masuk</button>
+            </form>
+
+            <!-- Form Register -->
+            <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                <div class="min-w-0">
+                    <label for="regGmail" class="block text-xs font-semibold text-gray-300 mb-1">Alamat Gmail</label>
+                    <input type="email" id="regGmail" required pattern="[a-zA-Z0-9._%+\-]+@gmail\.com" title="Gunakan alamat Gmail aktif yang berakhiran @gmail.com" placeholder="Contoh: namaanda@gmail.com" class="w-full glass-input p-3 rounded-xl text-sm">
+                </div>
+                <div class="min-w-0">
+                    <label for="regUsername" class="block text-xs font-semibold text-gray-300 mb-1">Username Baru</label>
+                    <input type="text" id="regUsername" required placeholder="Username" class="w-full glass-input p-3 rounded-xl text-sm">
+                </div>
+                <div class="min-w-0">
+                    <label for="regPassword" class="block text-xs font-semibold text-gray-300 mb-1">Password</label>
+                    <div class="relative">
+                        <input type="password" id="regPassword" required placeholder="••••••••" class="w-full glass-input p-3 pr-10 rounded-xl text-sm">
+                        <button type="button" onclick="togglePasswordVisibility('regPassword', 'iconRegPass')" aria-label="Tampilkan atau sembunyikan password" class="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-white flex items-center">
+                            <i id="iconRegPass" class="fa-solid fa-eye text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="w-full gradient-btn py-3 rounded-xl font-bold text-white text-sm shadow-lg">Buat Akun Baru</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer Perusahaan / Universitas -->
+    <footer class="mt-12 border-t border-gray-800 bg-gray-950/80 py-8 text-gray-400">
+        <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 mb-6 text-sm">
+            <div class="min-w-0 space-y-3">
+                <h4 class="text-white font-bold text-lg tracking-wide">MANAJEMENKU</h4>
+                <p class="text-xs text-gray-400 leading-relaxed break-words">
+                    Platform Smart Finance System yang dirancang secara presisi untuk membantu pengelolaan keuangan harian, analisis arus kas, serta pemantauan transaksi secara terintegrasi dan efisien.
+                </p>
+            </div>
+            <div class="min-w-0 space-y-3">
+                <h4 class="text-white font-semibold text-sm uppercase tracking-wider">Tim Pengembang</h4>
+                <ul class="space-y-1.5 text-xs">
+                    <li class="break-words"><span class="text-gray-300">M. Nazar Habib. A</span> — <span class="text-gray-300">Lead Web Developer</span></li>
+                    <li class="break-words"><span class="text-gray-300">Salsabila Lilanti</span></li>
+                    <li class="break-words"><span class="text-gray-300">Manggala Satrio Wijoyo</span></li>
+                    <li class="break-words"><span class="text-gray-300">M. Iman Nur Ikhfarel Al Hakim</span></li>
+                </ul>
+            </div>
+            <div class="min-w-0 space-y-3">
+                <h4 class="text-white font-semibold text-sm uppercase tracking-wider">Afiliasi Industri & Akademis</h4>
+                <p class="text-xs text-gray-400 leading-relaxed break-words">
+                    Dikembangkan oleh mahasiswa <span class="text-gray-300">Prodi Teknologi Informasi</span>, Fakultas Teknik & Informatika — <strong class="text-gray-200">Universitas Bina Sarana Informatika (UBSI)</strong>.
+                </p>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-800/60 pt-6 pb-2 text-center text-xs space-y-4 max-w-6xl mx-auto flex flex-col items-center justify-center">
+            <div class="flex items-center justify-center gap-6 sm:gap-10">
+                <img src="{{ url_for('static', filename='logo-ubsi.png') }}" alt="Logo UBSI" class="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-2xl">
+                <img src="{{ url_for('static', filename='logo-lembaga.png') }}" alt="Logo Lembaga Manajemenku" class="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-2xl">
+            </div>
+
+            <p class="text-gray-300 font-medium text-xs sm:text-sm max-w-md px-4 pt-1">
+                Terima kasih telah mengunjungi platform resmi yang dikelola oleh tim kami.
+            </p>
+
+            <p class="text-gray-500 pt-2 border-t border-gray-800/40 w-full">
+                © 2026 PT Manajemenku Teknologi Indonesia & UBSI Team. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        function switchTab(tab) {
+            if (tab === 'login') {
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('registerForm').classList.add('hidden');
+                document.getElementById('tabLogin').className = "w-1/2 py-2 text-indigo-400 border-b-2 border-indigo-500";
+                document.getElementById('tabRegister').className = "w-1/2 py-2 text-gray-500 hover:text-gray-300";
+            } else {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('registerForm').classList.remove('hidden');
+                document.getElementById('tabRegister').className = "w-1/2 py-2 text-indigo-400 border-b-2 border-indigo-500";
+                document.getElementById('tabLogin').className = "w-1/2 py-2 text-gray-500 hover:text-gray-300";
+            }
+        }
+
+        function showAlert(msg, isSuccess = false) {
+            const alertBox = document.getElementById('authAlert');
+            alertBox.classList.remove('hidden', 'bg-rose-500/10', 'text-rose-400', 'border-rose-500/20', 'bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/20');
+            if (isSuccess) alertBox.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border', 'border-emerald-500/20');
+            else alertBox.classList.add('bg-rose-500/10', 'text-rose-400', 'border', 'border-rose-500/20');
+            alertBox.innerText = msg;
+        }
+
+        function isValidGmailClient(email) {
+            return /^[a-zA-Z0-9._%+\-]+@gmail\.com$/i.test(email.trim());
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const gmail = document.getElementById('regGmail').value.trim().toLowerCase();
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            if (!isValidGmailClient(gmail)) {
+                showAlert('Alamat Gmail harus valid dan menggunakan domain @gmail.com.');
+                return;
+            }
+
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ full_name: gmail, username, password })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showAlert(data.message, true);
+                switchTab('login');
+            } else {
+                showAlert(data.message);
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.href = '/';
+            } else {
+                showAlert(data.message);
+            }
+        }
+
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (!input || !icon) return;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

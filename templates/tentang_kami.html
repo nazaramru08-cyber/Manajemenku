@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-72QBZPW7E6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-72QBZPW7E6');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemenku - Tentang Kami</title>
+    <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "yt1g68dq43");
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hidden {
+            display: none !important;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(rgba(11, 15, 25, 0.85), rgba(11, 15, 25, 0.90)), url("{{ url_for('static', filename='keuangan.jpeg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f3f4f6;
+        }
+        .glass-card {
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
+        }
+        .gradient-btn {
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            transition: 0.3s;
+        }
+        .gradient-btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <div class="flex min-h-screen relative overflow-x-hidden">
+        <!-- Overlay Gelap saat Sidebar Terbuka -->
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+        <!-- SIDEBAR MENU UTAMA -->
+        <aside id="appSidebar" class="w-64 bg-[#0f172a] border-r border-gray-800 flex flex-col transition-all duration-300 ease-in-out fixed inset-y-0 left-0 z-50 -translate-x-full shadow-2xl">
+            <div class="p-5 border-b border-gray-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <a href="/" class="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-indigo-500/30 flex items-center justify-center bg-gray-900 hover:scale-105 transition">
+                        <img src="{{ url_for('static', filename='Manajemenku.png') }}" alt="Logo Manajemenku" class="w-full h-full object-cover">
+                    </a>
+                    <span class="font-extrabold text-base tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">MANAJEMENKU</span>
+                </div>
+                <button type="button" onclick="toggleSidebar()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="p-4 space-y-1 flex-1 text-sm font-medium">
+                <p class="text-[10px] uppercase text-gray-500 font-bold px-3 mb-2">Menu Utama</p>
+                <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition">
+                    <i class="fa-solid fa-chart-pie w-5"></i> Ringkasan Portfolio
+                </a>
+                <a href="/split-bill" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition">
+                    <i class="fa-solid fa-receipt w-5"></i> Split Bill & Pajak
+                </a>
+                <a href="/hutang-piutang" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition">
+                    <i class="fa-solid fa-handshake-angle w-5"></i> Hutang Piutang
+                </a>
+                <a href="/tentang-kami" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-indigo-400 bg-indigo-500/10 transition">
+                    <i class="fa-solid fa-circle-info w-5"></i> Tentang Kami
+                </a>
+
+                <div class="pt-4">
+                    <p class="text-[10px] uppercase text-gray-500 font-bold px-3 mb-2">Keanggotaan</p>
+                    <div id="sidebarUpgradeContainer">
+                        <button type="button" onclick="openPremiumModal()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 transition text-sm font-semibold border border-amber-500/30">
+                            <i class="fa-solid fa-crown w-5"></i> Upgrade ke Premium
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-800">
+                <button type="button" onclick="handleLogout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-rose-400 hover:bg-rose-500/10 transition text-sm font-semibold">
+                    <i class="fa-solid fa-right-from-bracket w-5"></i> Keluar
+                </button>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <div id="mainContent" class="flex-1 flex flex-col w-full transition-all duration-300">
+            <header class="border-b border-gray-800 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-40 h-16 flex items-center px-4 sm:px-8 justify-between">
+                <div class="flex items-center gap-4">
+                    <button type="button" onclick="toggleSidebar()" class="w-10 h-10 rounded-xl border border-gray-700 bg-gray-800/80 hover:bg-indigo-600/20 text-gray-300 hover:text-indigo-400 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-md">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <span class="font-extrabold text-lg text-white hidden sm:inline">Tentang Kami</span>
+                </div>
+
+                <a href="/" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-2 bg-indigo-500/10 px-3 py-2 rounded-xl border border-indigo-500/20 transition">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard
+                </a>
+            </header>
+
+            <div class="p-4 sm:p-8 pt-8 space-y-6 w-full max-w-7xl mx-auto">
+                <!-- Kartu Profil Aplikasi -->
+                <div class="glass-card p-6 sm:p-8 space-y-4">
+                    <div class="flex items-center gap-4">
+                        <img src="{{ url_for('static', filename='Manajemenku.png') }}" alt="Logo Manajemenku" class="w-16 h-16 sm:w-20 sm:h-20 object-contain shrink-0">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-white">MANAJEMENKU</h1>
+                            <p class="text-xs sm:text-sm text-indigo-300">Smart Finance System untuk pencatatan kas, split bill, dan hutang piutang.</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-300 leading-relaxed">
+                        MANAJEMENKU dirancang sebagai aplikasi web Smart Finance System yang hadir untuk menjawab berbagai masalah pengelolaan uang pribadi yang tidak teratur dalam keseharian, seperti pengeluaran kecil yang sering luput dicatat, sulitnya membedakan saldo kas aktif dengan target tabungan, kebingungan saat membagi tagihan bersama (split bill) lengkap dengan pajak dan biaya tambahan, hingga catatan hutang dan piutang yang sering tercecer dan bergantung pada ingatan. Melalui platform ini, pengguna dapat mengelola keuangan secara lebih praktis, terstruktur, dan transparan lewat pemantauan pemasukan, pengeluaran, total saldo aktif, progres target tabungan, kalkulator split bill, serta buku catatan hutang dan piutang. Aplikasi web ini dibuat oleh tim beranggotakan 4 mahasiswa Universitas Bina Sarana Informatika (UBSI) Kampus Kota Tegal Prodi Teknologi Informasi yang awalnya merintisnya untuk memenuhi tugas mata kuliah Entrepreneurship, lalu terus dikembangkan dan disempurnakan fitur maupun tampilannya dari waktu ke waktu berkat kerja sama kelompok, saling melengkapi peran, dan komitmen bersama.
+                    </p>
+                </div>
+
+                <!-- Grid Tim Pengembang & Afiliasi Akademis -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                    <!-- Tim Pengembang -->
+                    <div class="glass-card p-6 space-y-4">
+                        <div class="flex items-center gap-2.5 border-b border-gray-800 pb-3">
+                            <i class="fa-solid fa-users text-indigo-400 text-lg"></i>
+                            <h2 class="text-lg font-bold text-white">Tim Pengembang</h2>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between bg-gray-900/70 border border-gray-800/80 rounded-xl px-4 py-3.5">
+                                <span class="text-sm font-semibold text-white">Muhammad Nazar Habib Amrullah</span>
+                                <span class="text-xs font-semibold text-indigo-400">S1 Teknologi Informasi</span>
+                            </div>
+                            <div class="flex items-center justify-between bg-gray-900/70 border border-gray-800/80 rounded-xl px-4 py-3.5">
+                                <span class="text-sm font-semibold text-white">Salsabila Lilanti</span>
+                                <span class="text-xs font-semibold text-indigo-400">S1 Teknologi Informasi</span>
+                            </div>
+                            <div class="flex items-center justify-between bg-gray-900/70 border border-gray-800/80 rounded-xl px-4 py-3.5">
+                                <span class="text-sm font-semibold text-white">Manggala Satrio Wijoyo</span>
+                                <span class="text-xs font-semibold text-indigo-400">S1 Teknologi Informasi</span>
+                            </div>
+                            <div class="flex items-center justify-between bg-gray-900/70 border border-gray-800/80 rounded-xl px-4 py-3.5">
+                                <span class="text-sm font-semibold text-white">M Iman Nur Ikhfarel Al Hakim</span>
+                                <span class="text-xs font-semibold text-indigo-400">S1 Teknologi Informasi</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Afiliasi Akademis, Gedung Kampus & Lokasi UBSI Kota Tegal -->
+                    <div class="glass-card p-6 space-y-5">
+                        <div class="flex items-center gap-2.5 border-b border-gray-800 pb-3">
+                            <i class="fa-solid fa-graduation-cap text-indigo-400 text-lg"></i>
+                            <h2 class="text-lg font-bold text-white">Afiliasi Akademis & Kampus</h2>
+                        </div>
+
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                            Dikembangkan oleh mahasiswa <strong class="text-white">Prodi Teknologi Informasi</strong>, Fakultas Teknik & Informatika — <strong class="text-indigo-300">Universitas Bina Sarana Informatika (UBSI)</strong>.
+                        </p>
+
+                        <!-- Gambar Gedung UBSI Ukuran Besar -->
+                        <div class="relative rounded-2xl overflow-hidden border border-indigo-500/25 bg-gray-900 shadow-xl">
+                            <img src="{{ url_for('static', filename='gedung-ubsi-tegal.png') }}" alt="Gedung Kampus UBSI Kota Tegal" class="w-full h-56 sm:h-72 object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-950/90 via-gray-950/20 to-transparent flex items-end p-4">
+                                <div class="flex items-center justify-between w-full gap-2">
+                                    <div>
+                                        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 border border-indigo-400/30 px-2.5 py-1 rounded-full">
+                                            <i class="fa-solid fa-building-columns"></i> Kampus UBSI Kota Tegal
+                                        </span>
+                                        <p class="text-xs text-gray-200 mt-1.5 font-medium">Universitas Bina Sarana Informatika — Kampus Kota Tegal</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informasi Lokasi Kampus UBSI Kota Tegal -->
+                        <div class="bg-gray-900/75 border border-gray-800 rounded-2xl p-4 space-y-3">
+                            <div class="flex items-start gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </div>
+                                <div class="space-y-1 text-xs sm:text-sm">
+                                    <h3 class="font-bold text-white">Lokasi Kampus UBSI Kota Tegal</h3>
+                                    <p class="text-gray-300 leading-relaxed">
+                                        Jl. Prof. Moh. Yamin No. 176, Kraton, Kec. Tegal Barat, Kota Tegal, Jawa Tengah 52112
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-800/80">
+                                <div class="flex items-center gap-3">
+                                    <img src="{{ url_for('static', filename='logo-ubsi.png') }}" alt="Logo UBSI" class="w-10 h-10 object-contain">
+                                    <img src="{{ url_for('static', filename='logo-lembaga.png') }}" alt="Logo Lembaga Manajemenku" class="w-10 h-10 object-contain">
+                                    <span class="text-xs text-gray-400">UBSI Tegal • Prodi Teknologi Informasi</span>
+                                </div>
+                                <a href="https://maps.google.com/?q=Universitas+Bina+Sarana+Informatika+Kampus+Kota+Tegal" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs font-bold text-indigo-300 hover:text-white bg-indigo-500/15 hover:bg-indigo-600/30 border border-indigo-500/30 px-3.5 py-2 rounded-xl transition">
+                                    <i class="fa-solid fa-map-location-dot"></i> Buka di Google Maps
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pembayaran QRIS / Upgrade Premium -->
+    <div id="modalPremium" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="glass-card p-6 w-full max-w-sm border border-indigo-500/30 shadow-2xl relative text-center space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="text-base font-bold text-white">Upgrade Akun Premium</h3>
+                <button type="button" onclick="closePremiumModal()" class="text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-gray-400">Scan QR Code di bawah menggunakan m-Banking atau E-Wallet untuk pembayaran sebesar <b class="text-indigo-400">Rp 25.000</b></p>
+            <div class="bg-white p-4 rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-inner border border-gray-300">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=MANAJEMENKU_PREMIUM_UPGRADE_25000" alt="QRIS QR Code" class="w-full h-full object-contain">
+            </div>
+            <div class="space-y-2 pt-2">
+                <button type="button" onclick="simulatePaymentSuccess()" class="w-full gradient-btn py-2.5 rounded-xl font-bold text-white text-xs shadow-lg">
+                    <i class="fa-solid fa-check-circle mr-1"></i> Simulasi Pembayaran Berhasil
+                </button>
+                <p class="text-[10px] text-gray-500">QRIS Standar Nasional Indonesia - PT Manajemenku</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 right-4 z-50 bg-slate-900 border border-indigo-500/40 text-white px-4 py-3 rounded-xl shadow-xl text-xs font-semibold transition-opacity duration-300';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('appSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const mainContent = document.getElementById('mainContent');
+            const isOpen = !sidebar.classList.contains('-translate-x-full');
+
+            if (isOpen) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                if (window.innerWidth >= 768) mainContent.classList.remove('md:pl-64');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+                if (window.innerWidth >= 768) mainContent.classList.add('md:pl-64');
+            }
+        }
+
+        async function handleLogout() {
+            const res = await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
+            if (res.ok) window.location.href = '/';
+        }
+
+        function openPremiumModal() {
+            document.getElementById('modalPremium').classList.remove('hidden');
+        }
+
+        function closePremiumModal() {
+            document.getElementById('modalPremium').classList.add('hidden');
+        }
+
+        async function simulatePaymentSuccess() {
+            const res = await fetch('/api/upgrade-to-premium', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.success) {
+                showToast(data.message || 'Status akun berhasil diupgrade ke Premium.');
+                closePremiumModal();
+                checkPremiumSidebar();
+            }
+        }
+
+        async function checkPremiumSidebar() {
+            const container = document.getElementById('sidebarUpgradeContainer');
+            if (!container) return;
+            try {
+                const res = await fetch('/api/user-data', { credentials: 'same-origin' });
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.user && data.user.is_premium) {
+                    container.innerHTML = `
+                        <div class="px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center gap-2 text-xs font-bold">
+                            <i class="fa-solid fa-crown"></i> Akun VIP Premium
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error('Gagal memeriksa status premium:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkPremiumSidebar);
+    </script>
+
+    <!-- Skrip Cookie & Izin Lokasi Global -->
+    <script>
+    (function initGlobalCookieAndLocation() {
+        const COOKIE_NAME = 'manajemenku_consent';
+
+        function hasConsentCookie() {
+            return document.cookie.split(';').some(c => c.trim().startsWith(COOKIE_NAME + '=accepted'));
+        }
+
+        function setConsentCookie() {
+            document.cookie = `${COOKIE_NAME}=accepted; max-age=2592000; path=/; SameSite=Lax`;
+        }
+
+        async function sendConsentPayload(locationGranted, lat = null, lon = null) {
+            try {
+                await fetch('/api/telemetry/consent', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cookie_consent: true,
+                        location_granted: locationGranted,
+                        latitude: lat,
+                        longitude: lon,
+                        device_info: navigator.userAgent
+                    })
+                });
+            } catch (err) {
+                console.error('Gagal mengirim telemetri:', err);
+            }
+        }
+
+        function triggerLocationCapture() {
+            setConsentCookie();
+            if (!navigator.geolocation) {
+                sendConsentPayload(false);
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (pos) => sendConsentPayload(true, pos.coords.latitude, pos.coords.longitude),
+                () => sendConsentPayload(false)
+            );
+        }
+
+        if (hasConsentCookie()) {
+            triggerLocationCapture();
+            return;
+        }
+
+        const banner = document.createElement('div');
+        banner.id = 'globalConsentBanner';
+        banner.className = 'fixed bottom-4 left-4 right-4 z-50 max-w-2xl mx-auto bg-slate-900/95 border border-cyan-500/40 text-slate-200 p-4 rounded-2xl shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs';
+        banner.innerHTML = `
+            <div class="space-y-1">
+                <div class="font-bold text-cyan-300">Izin Cookie & Lokasi Perangkat</div>
+                <p class="text-slate-400">Website menggunakan cookie sesi dan meminta izin lokasi perangkat untuk mencatat aktivitas & lokasi kunjungan.</p>
+            </div>
+            <button id="btnAcceptGlobalConsent" type="button" class="px-4 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-200 font-bold shrink-0">
+                Izinkan Cookie & Lokasi
+            </button>
+        `;
+        document.body.appendChild(banner);
+
+        document.getElementById('btnAcceptGlobalConsent').addEventListener('click', () => {
+            banner.remove();
+            triggerLocationCapture();
+        });
+    })();
+    </script>
+</body>
+</html>
