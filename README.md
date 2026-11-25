@@ -32,3 +32,31 @@ Manajemenku/
 ├── requirements.txt     # Daftar dependensi Python
 ├── static/              # Aset gambar & logo aplikasi (Manajemenku.png, dll.)
 └── templates/           # Halaman antarmuka HTML (login, index, split_bill, dll.)
+
+ara Menjalankan di Lokal
+Clone repository ini:
+
+Bash
+git clone [https://github.com/nazaramru08-cyber/Manajemenku.git](https://github.com/nazaramru08-cyber/Manajemenku.git)
+cd Manajemenku
+Instal dependensi:
+
+Bash
+pip install -r requirements.txt
+Jalankan aplikasi:
+
+Bash
+python main.py
+Buka di browser:
+Akses http://127.0.0.1:5000
+
+Tim Pengembang
+Dikembangkan oleh mahasiswa Program Studi Teknologi Informasi, Fakultas Teknik & Informatika, Universitas Bina Sarana Informatika (UBSI) Kampus Kota Tegal (awal pengembangan untuk mata kuliah Entrepreneurship):
+
+M. Nazar Habib Amrullah — Lead Web Developer
+
+Salsabila Lilanti
+
+Manggala Satrio Wijoyo
+
+M. Iman Nur Ikhfarel Al Hakim
