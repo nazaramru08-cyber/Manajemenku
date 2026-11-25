@@ -52,7 +52,7 @@ Manajemenku/
 
 Dikembangkan oleh mahasiswa **Program Studi Teknologi Informasi, Fakultas Teknik & Informatika, Universitas Bina Sarana Informatika (UBSI) Kampus Kota Tegal** (awal pengembangan untuk mata kuliah *Entrepreneurship*):
 
-* **M. Nazar Habib Amrullah** — *Lead Web Developer*
+* **Muhammad Nazar Habib Amrullah** — *Lead Web Developer*
 * **Salsabila Lilanti**
 * **Manggala Satrio Wijoyo**
-* **M. Iman Nur Ikhfarel Al Hakim**
+* **M Iman Nur Ikhfarel Al Hakim**
