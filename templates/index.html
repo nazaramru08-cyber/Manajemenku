@@ -486,11 +486,7 @@
                 if (headerUpgradeContainer) headerUpgradeContainer.classList.add('hidden');
                 if (pdfContainer) pdfContainer.classList.remove('hidden');
             } else {
-                upgradeContainer.innerHTML = `
-                    <button type="button" onclick="openPremiumModal()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 transition text-sm font-semibold border border-amber-500/30">
-                        <i class="fa-solid fa-crown w-5"></i> Upgrade ke Premium
-                    </button>
-                `;
+                upgradeContainer.innerHTML = ``;
                 headerBadge.innerHTML = ``;
                 if (headerUpgradeContainer) headerUpgradeContainer.classList.remove('hidden');
                 if (pdfContainer) pdfContainer.classList.add('hidden');
