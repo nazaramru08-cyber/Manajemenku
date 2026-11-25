@@ -320,26 +320,36 @@
         </div>
     </div>
 
-    <!-- Modal Pembayaran QRIS / Upgrade Premium -->
+    <!-- Modal Pembayaran DANA QR / Upgrade Premium -->
     <div id="modalPremium" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="glass-card p-6 w-full max-w-sm border border-indigo-500/30 shadow-2xl relative text-center space-y-4">
             <div class="flex justify-between items-center">
                 <h3 class="text-base font-bold text-white">Upgrade Akun Premium</h3>
                 <button type="button" onclick="closePremiumModal()" class="text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <p class="text-xs text-gray-400">Scan QR Code di bawah menggunakan m-Banking atau E-Wallet untuk pembayaran sebesar <b class="text-indigo-400">Rp 25.000</b></p>
+            <p class="text-xs text-gray-400">Scan QR Code DANA di bawah untuk pembayaran sebesar <b class="text-indigo-400">Rp 25.000</b></p>
 
-            <!-- Gambar Simulasi QR Code -->
+            <!-- Gambar QR Code DANA Asli -->
             <div class="bg-white p-4 rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-inner border border-gray-300">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=MANAJEMENKU_PREMIUM_UPGRADE_25000" alt="QRIS QR Code" class="w-full h-full object-contain">
+                <img src="{{ url_for('static', filename='qr-dana.png') }}" alt="QR Code DANA" class="w-full h-full object-contain">
             </div>
 
-            <div class="space-y-2 pt-2">
-                <button type="button" onclick="simulatePaymentSuccess()" class="w-full gradient-btn py-2.5 rounded-xl font-bold text-white text-xs shadow-lg">
-                    <i class="fa-solid fa-check-circle mr-1"></i> Simulasi Pembayaran Berhasil
+            <form onsubmit="submitPaymentConfirmation(event)" class="space-y-3 text-left pt-1">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Nama Pengirim (Akun DANA)</label>
+                    <input type="text" id="danaSenderName" required placeholder="Contoh: M. Nazar Habib" class="w-full glass-input p-2.5 rounded-xl text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Catatan / No. Referensi Transfer</label>
+                    <input type="text" id="danaPaymentNote" required placeholder="Contoh: Transfer VIP Rp 25.000" class="w-full glass-input p-2.5 rounded-xl text-xs">
+                </div>
+                <button type="submit" id="btnSubmitPaymentConfirm" class="w-full gradient-btn py-2.5 rounded-xl font-bold text-white text-xs shadow-lg">
+                    <i class="fa-solid fa-paper-plane mr-1"></i> Kirim Konfirmasi Pembayaran
                 </button>
-                <p class="text-[10px] text-gray-500">QRIS Standar Nasional Indonesia - PT Manajemenku</p>
-            </div>
+            </form>
+
+            <p id="paymentConfirmStatus" class="text-[11px] text-amber-300 hidden"></p>
+            <p class="text-[10px] text-gray-500">Pembayaran DANA • PT Manajemenku</p>
         </div>
     </div>
 
@@ -529,26 +539,84 @@
             window.location.href = '/api/export-pdf';
         }
 
+        async function loadLatestPaymentStatus() {
+            const statusEl = document.getElementById('paymentConfirmStatus');
+            if (!statusEl) return;
+
+            try {
+                const res = await fetch('/api/premium-payment-status', { credentials: 'same-origin' });
+                if (!res.ok) return;
+                const data = await res.json();
+                const conf = data && data.confirmation;
+
+                if (conf && conf.status === 'pending') {
+                    statusEl.textContent = `Status terakhir: Menunggu verifikasi (${conf.sender_name} • ${conf.payment_note}).`;
+                    statusEl.classList.remove('hidden');
+                } else if (conf && conf.status === 'rejected') {
+                    statusEl.textContent = 'Pengajuan sebelumnya ditolak. Silakan kirim ulang konfirmasi pembayaran yang valid.';
+                    statusEl.classList.remove('hidden');
+                } else {
+                    statusEl.classList.add('hidden');
+                }
+            } catch (err) {
+                console.error('Gagal memuat status konfirmasi:', err);
+            }
+        }
+
         function openPremiumModal() {
             document.getElementById('modalPremium').classList.remove('hidden');
+            loadLatestPaymentStatus();
         }
 
         function closePremiumModal() {
             document.getElementById('modalPremium').classList.add('hidden');
         }
 
-        async function simulatePaymentSuccess() {
-            const res = await fetch('/api/upgrade-to-premium', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            if (!res.ok) return;
-            const data = await res.json();
-            if (data.success) {
-                showToast(data.message || 'Status akun berhasil diupgrade ke Premium.');
-                closePremiumModal();
-                checkUserState();
+        async function submitPaymentConfirmation(e) {
+            e.preventDefault();
+            const senderName = document.getElementById('danaSenderName').value.trim();
+            const paymentNote = document.getElementById('danaPaymentNote').value.trim();
+            const statusEl = document.getElementById('paymentConfirmStatus');
+            const submitBtn = document.getElementById('btnSubmitPaymentConfirm');
+
+            if (!senderName || !paymentNote) {
+                showToast('Lengkapi nama pengirim dan catatan pembayaran terlebih dahulu.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-60');
+
+            try {
+                const res = await fetch('/api/confirm-premium-payment', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sender_name: senderName,
+                        payment_note: paymentNote,
+                        amount: 25000,
+                        method: 'DANA_QR'
+                    })
+                });
+
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok && data.success) {
+                    statusEl.textContent = data.message || 'Konfirmasi pembayaran terkirim. Menunggu verifikasi.';
+                    statusEl.classList.remove('hidden');
+                    showToast(data.message || 'Konfirmasi pembayaran berhasil dikirim.');
+                    e.target.reset();
+                    checkUserState();
+                } else {
+                    showToast(data.message || 'Gagal mengirim konfirmasi pembayaran.');
+                }
+            } catch (err) {
+                console.error('Error konfirmasi pembayaran:', err);
+                showToast('Terjadi kesalahan jaringan saat mengirim konfirmasi.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-60');
             }
         }
 
