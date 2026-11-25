@@ -157,20 +157,31 @@
             </header>
 
             <div class="p-4 sm:p-8 pt-8 space-y-8 w-full max-w-7xl mx-auto">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div>
                         <h1 class="text-2xl font-extrabold text-white">Ringkasan Portofolio</h1>
                         <p class="text-xs text-gray-400 mt-0.5">Kelola arus kas secara terstruktur dan otomatis.</p>
                     </div>
 
-                    <div class="flex items-center gap-3 flex-wrap">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
                         <!-- Tombol Download Laporan PDF (VIP Only) -->
                         <div id="pdfExportContainer" class="hidden">
                             <button type="button" onclick="downloadPdfReport()" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-90 px-5 py-3 rounded-xl font-semibold text-white flex items-center gap-2 text-sm transition shadow-lg">
                                 <i class="fa-solid fa-file-pdf"></i> Download Laporan PDF (VIP)
                             </button>
                         </div>
-                        <button type="button" onclick="openModal()" class="gradient-btn px-5 py-3 rounded-xl font-semibold text-white flex items-center gap-2 text-sm transition hover:scale-105 shadow-lg">
+
+                        <!-- Tombol Upgrade Premium + Penjelasan Manfaat di Samping Catat Transaksi -->
+                        <div id="headerUpgradeContainer" class="flex flex-col sm:flex-row sm:items-center gap-2.5 bg-gray-900/80 border border-amber-500/25 px-3.5 py-2.5 rounded-2xl">
+                            <button type="button" onclick="openPremiumModal()" class="px-4 py-2.5 rounded-xl font-semibold text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 flex items-center gap-2 text-xs sm:text-sm transition shrink-0">
+                                <i class="fa-solid fa-crown"></i> Upgrade ke Premium
+                            </button>
+                            <p class="text-[11px] text-gray-300 leading-snug max-w-xs">
+                                Dengan akun <b class="text-amber-300">Premium</b>, kamu bisa <b class="text-white">mengunduh laporan keuangan dalam bentuk PDF</b> serta <b class="text-white">membantu pengembangan web</b> ini selanjutnya.
+                            </p>
+                        </div>
+
+                        <button type="button" onclick="openModal()" class="gradient-btn px-5 py-3 rounded-xl font-semibold text-white flex items-center gap-2 text-sm transition hover:scale-105 shadow-lg shrink-0">
                             <i class="fa-solid fa-plus"></i> Catat Transaksi Baru
                         </button>
                     </div>
@@ -457,6 +468,7 @@
             document.getElementById('userAvatar').textContent = fullName.charAt(0).toUpperCase() || 'U';
 
             const upgradeContainer = document.getElementById('sidebarUpgradeContainer');
+            const headerUpgradeContainer = document.getElementById('headerUpgradeContainer');
             const headerBadge = document.getElementById('headerPremiumBadge');
             const pdfContainer = document.getElementById('pdfExportContainer');
 
@@ -471,7 +483,8 @@
                         <i class="fa-solid fa-crown"></i> VIP
                     </span>
                 `;
-                if(pdfContainer) pdfContainer.classList.remove('hidden');
+                if (headerUpgradeContainer) headerUpgradeContainer.classList.add('hidden');
+                if (pdfContainer) pdfContainer.classList.remove('hidden');
             } else {
                 upgradeContainer.innerHTML = `
                     <button type="button" onclick="openPremiumModal()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 transition text-sm font-semibold border border-amber-500/30">
@@ -479,7 +492,8 @@
                     </button>
                 `;
                 headerBadge.innerHTML = ``;
-                if(pdfContainer) pdfContainer.classList.add('hidden');
+                if (headerUpgradeContainer) headerUpgradeContainer.classList.remove('hidden');
+                if (pdfContainer) pdfContainer.classList.add('hidden');
             }
 
             let totalIncome = 0;
