@@ -8,6 +8,7 @@ import re
 import secrets
 import time
 import smtplib
+from datetime import datetime, timezone
 from functools import wraps
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -159,6 +160,19 @@ with get_db_connection() as conn:
                 updated_at TEXT
             )
         ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS premium_payment_confirmations (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL REFERENCES users (id),
+                sender_name TEXT NOT NULL,
+                payment_note TEXT NOT NULL,
+                amount INTEGER NOT NULL DEFAULT 25000,
+                method TEXT NOT NULL DEFAULT 'DANA_QR',
+                status TEXT NOT NULL DEFAULT 'pending',
+                created_at TEXT NOT NULL,
+                verified_at TEXT
+            )
+        ''')
     else:
         conn.execute('''
             CREATE TABLE IF NOT EXISTS users (
@@ -203,6 +217,20 @@ with get_db_connection() as conn:
                 latitude REAL,
                 longitude REAL,
                 updated_at TEXT
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS premium_payment_confirmations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                sender_name TEXT NOT NULL,
+                payment_note TEXT NOT NULL,
+                amount INTEGER NOT NULL DEFAULT 25000,
+                method TEXT NOT NULL DEFAULT 'DANA_QR',
+                status TEXT NOT NULL DEFAULT 'pending',
+                created_at TEXT NOT NULL,
+                verified_at TEXT,
+                FOREIGN KEY (user_id) REFERENCES users (id)
             )
         ''')
     conn.commit()
@@ -570,6 +598,131 @@ def logout():
 @app.route('/split-bill')
 def split_bill():
     return render_template('split_bill.html')
+
+
+@app.route('/api/confirm-premium-payment', methods=['POST'])
+def confirm_premium_payment():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Silakan login terlebih dahulu.'}), 401
+
+    payload = request.get_json(silent=True) or {}
+    sender_name = (payload.get('sender_name') or '').strip()
+    payment_note = (payload.get('payment_note') or '').strip()
+    method = (payload.get('method') or 'DANA_QR').strip()[:32]
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    if not sender_name or not payment_note:
+        return jsonify({
+            'success': False,
+            'message': 'Nama pengirim DANA dan catatan/no. referensi wajib diisi.'
+        }), 400
+
+    with get_db_connection() as conn:
+        user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
+        if not user:
+            return jsonify({'success': False, 'message': 'Akun pengguna tidak ditemukan.'}), 404
+
+        if bool(user['is_premium']):
+            return jsonify({
+                'success': True,
+                'status': 'already_premium',
+                'message': 'Akun kamu sudah berstatus VIP Premium.'
+            }), 200
+
+        existing_pending = conn.execute('''
+            SELECT * FROM premium_payment_confirmations
+            WHERE user_id = ? AND status = 'pending'
+            ORDER BY id DESC LIMIT 1
+        ''', (user['id'],)).fetchone()
+
+        if existing_pending:
+            conn.execute('''
+                UPDATE premium_payment_confirmations
+                SET sender_name = ?, payment_note = ?, method = ?, created_at = ?
+                WHERE id = ?
+            ''', (sender_name[:120], payment_note[:255], method, now_iso, existing_pending['id']))
+            conn.commit()
+            updated_row = conn.execute('SELECT * FROM premium_payment_confirmations WHERE id = ?', (existing_pending['id'],)).fetchone()
+            return jsonify({
+                'success': True,
+                'status': 'pending',
+                'confirmation': dict(updated_row),
+                'message': 'Pengajuan konfirmasi pembayaran sebelumnya diperbarui dan masih menunggu verifikasi.'
+            }), 200
+
+        if USE_POSTGRES:
+            created_row = conn.execute('''
+                INSERT INTO premium_payment_confirmations
+                (user_id, sender_name, payment_note, amount, method, status, created_at)
+                VALUES (?, ?, ?, ?, ?, 'pending', ?)
+                RETURNING *
+            ''', (user['id'], sender_name[:120], payment_note[:255], 25000, method, now_iso)).fetchone()
+            conn.commit()
+            created_dict = dict(created_row)
+        else:
+            cur = conn.execute('''
+                INSERT INTO premium_payment_confirmations
+                (user_id, sender_name, payment_note, amount, method, status, created_at)
+                VALUES (?, ?, ?, ?, ?, 'pending', ?)
+            ''', (user['id'], sender_name[:120], payment_note[:255], 25000, method, now_iso))
+            conn.commit()
+            created_row = conn.execute('SELECT * FROM premium_payment_confirmations WHERE id = ?', (cur.lastrowid,)).fetchone()
+            created_dict = dict(created_row)
+
+    return jsonify({
+        'success': True,
+        'status': 'pending',
+        'confirmation': created_dict,
+        'message': 'Konfirmasi pembayaran DANA tersimpan. Menunggu verifikasi dan aktivasi VIP.'
+    }), 201
+
+
+@app.route('/api/premium-payment-status', methods=['GET'])
+def get_premium_payment_status():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Silakan login terlebih dahulu.'}), 401
+
+    with get_db_connection() as conn:
+        latest = conn.execute('''
+            SELECT * FROM premium_payment_confirmations
+            WHERE user_id = ?
+            ORDER BY id DESC LIMIT 1
+        ''', (session['user_id'],)).fetchone()
+
+    return jsonify({
+        'success': True,
+        'confirmation': dict(latest) if latest else None
+    }), 200
+
+
+@app.route('/api/admin/approve-premium/<int:confirmation_id>', methods=['POST'])
+@admin_required
+def approve_premium_confirmation(confirmation_id):
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with get_db_connection() as conn:
+        confirmation = conn.execute('SELECT * FROM premium_payment_confirmations WHERE id = ?', (confirmation_id,)).fetchone()
+        if not confirmation:
+            return jsonify({'success': False, 'message': 'Data konfirmasi tidak ditemukan.'}), 404
+
+        user = conn.execute('SELECT * FROM users WHERE id = ?', (confirmation['user_id'],)).fetchone()
+        if not user:
+            return jsonify({'success': False, 'message': 'Pengguna tidak ditemukan.'}), 404
+
+        conn.execute('''
+            UPDATE premium_payment_confirmations
+            SET status = 'approved', verified_at = ?
+            WHERE id = ?
+        ''', (now_iso, confirmation_id))
+        conn.execute('UPDATE users SET is_premium = 1 WHERE id = ?', (user['id'],))
+        conn.commit()
+
+        updated_conf = conn.execute('SELECT * FROM premium_payment_confirmations WHERE id = ?', (confirmation_id,)).fetchone()
+
+    return jsonify({
+        'success': True,
+        'message': f"Pembayaran #{confirmation_id} disetujui. Akun {user['full_name']} kini VIP Premium.",
+        'confirmation': dict(updated_conf)
+    }), 200
 
 
 @app.route('/api/upgrade-to-premium', methods=['POST'])
