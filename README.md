@@ -33,7 +33,8 @@ Manajemenku/
 ├── static/              # Aset gambar & logo aplikasi (Manajemenku.png, dll.)
 └── templates/           # Halaman antarmuka HTML (login, index, split_bill, dll.)
 
-ara Menjalankan di Lokal
+**Cara Menjalankan di Lokal**
+
 Clone repository ini:
 
 Bash
