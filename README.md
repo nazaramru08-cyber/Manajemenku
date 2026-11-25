@@ -20,8 +20,6 @@
 
 ## Struktur Proyek
 
-## Struktur Proyek
-
 ```text
 Manajemenku/
 ├── main.py              # File utama aplikasi web Flask & routing API
