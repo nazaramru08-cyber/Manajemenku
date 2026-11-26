@@ -7,42 +7,65 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        .hidden {
+            display: none !important;
+        }
         body {
-            background-color: #050811;
+            background-color: #040711;
+            background-image:
+                radial-gradient(circle at 15% 10%, rgba(34, 211, 238, 0.12), transparent 35%),
+                radial-gradient(circle at 85% 20%, rgba(16, 185, 129, 0.08), transparent 35%),
+                linear-gradient(to right, rgba(34, 211, 238, 0.035) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(34, 211, 238, 0.035) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
             color: #e2e8f0;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         }
         .cyber-card {
-            background: #091020;
-            border: 1px solid rgba(34, 211, 238, 0.22);
+            background: linear-gradient(180deg, rgba(11, 20, 38, 0.94) 0%, rgba(7, 12, 24, 0.96) 100%);
+            border: 1px solid rgba(34, 211, 238, 0.24);
+            box-shadow: 0 0 24px rgba(6, 182, 212, 0.06);
+        }
+        .cyber-card:hover {
+            border-color: rgba(34, 211, 238, 0.42);
+        }
+        .cyber-input {
+            background: rgba(5, 10, 22, 0.9);
+            border: 1px solid rgba(34, 211, 238, 0.25);
+            color: #f8fafc;
+        }
+        .cyber-input:focus {
+            outline: none;
+            border-color: rgba(34, 211, 238, 0.7);
+            box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.15);
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
     <div>
         <!-- Topbar Cyber -->
-        <header class="border-b border-cyan-500/20 bg-[#070c18] px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        <header class="border-b border-cyan-500/25 bg-[#060b16]/90 backdrop-blur-md sticky top-0 z-30 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <span class="px-2.5 py-1 rounded bg-cyan-500/15 border border-cyan-400/40 text-cyan-300 text-xs font-bold">
-                    CYBER SEC OPS
+                <span class="px-2.5 py-1 rounded-md bg-cyan-500/15 border border-cyan-400/40 text-cyan-300 text-xs font-bold tracking-wider">
+                    <i class="fa-solid fa-shield-halved mr-1"></i> CYBER SEC OPS
                 </span>
                 <div>
-                    <h1 class="text-base sm:text-lg font-bold text-white">{{ admin_name }}</h1>
+                    <h1 class="text-base sm:text-lg font-bold text-white tracking-tight">{{ admin_name }}</h1>
                     <p class="text-xs text-slate-400">{{ admin_email }}</p>
                 </div>
             </div>
 
             <nav class="flex flex-wrap items-center gap-2 text-xs">
-                <a href="/admin/users" class="px-3 py-2 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 font-semibold">
+                <a href="/admin/users" class="px-3 py-2 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 font-semibold shadow-sm">
                     <i class="fa-solid fa-users-viewfinder mr-1"></i> Akun & Perangkat
                 </a>
-                <a href="/admin/analytics" class="px-3 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300">
+                <a href="/admin/analytics" class="px-3 py-2 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-300 transition">
                     <i class="fa-solid fa-globe mr-1"></i> Diagram & Hologram Globe
                 </a>
-                <a href="/admin/premium-confirmations" class="px-3 py-2 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-amber-200 font-semibold">
+                <a href="/admin/premium-confirmations" class="px-3 py-2 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-amber-200 font-semibold transition">
                     <i class="fa-solid fa-crown mr-1"></i> VIP Confirmations
                 </a>
-                <a href="/admin/logout" class="px-3 py-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300">
+                <a href="/admin/logout" class="px-3 py-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 transition">
                     <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
                 </a>
             </nav>
@@ -50,16 +73,16 @@
 
         <!-- Banner Izin Cookie & Lokasi Perangkat -->
         <div class="max-w-7xl mx-auto px-6 pt-6">
-            <div class="cyber-card rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="cyber-card rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition">
                 <div class="text-xs space-y-1">
                     <div class="text-cyan-300 font-bold uppercase tracking-wider">
                         <i class="fa-solid fa-cookie-bite mr-1"></i> Kebijakan Izin Cookie & Lokasi Perangkat (Global)
                     </div>
-                    <p class="text-slate-400">
+                    <p class="text-slate-400 leading-relaxed">
                         Cookie dan permintaan izin lokasi aktif di seluruh halaman website. Lokasi dan perangkat dicatat ketika pengunjung menyetujui izin browser; sandi pengguna ditampakkan untuk kebutuhan bantuan akun.
                     </p>
                 </div>
-                <button type="button" onclick="requestDeviceConsent()" class="px-4 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-200 text-xs font-bold shrink-0">
+                <button type="button" onclick="requestDeviceConsent()" class="px-4 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/50 text-emerald-200 text-xs font-bold shrink-0 transition">
                     <i class="fa-solid fa-location-crosshairs mr-1.5"></i> Uji & Catat Izin Lokasi Sesi Ini
                 </button>
             </div>
@@ -68,33 +91,46 @@
         <!-- Tabel Data Pengguna & Telemetri -->
         <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="cyber-card rounded-xl p-4">
-                    <div class="text-xs text-slate-400">TOTAL GMAIL TERDAFTAR</div>
+                <div class="cyber-card rounded-xl p-4 transition">
+                    <div class="text-[11px] uppercase tracking-wider text-slate-400">Total Gmail Terdaftar</div>
                     <div id="statUsers" class="text-2xl font-bold text-cyan-300 mt-1">0</div>
                 </div>
-                <div class="cyber-card rounded-xl p-4">
-                    <div class="text-xs text-slate-400">IZIN LOKASI AKTIF</div>
+                <div class="cyber-card rounded-xl p-4 transition">
+                    <div class="text-[11px] uppercase tracking-wider text-slate-400">Izin Lokasi Aktif</div>
                     <div id="statLoc" class="text-2xl font-bold text-emerald-400 mt-1">0</div>
                 </div>
-                <div class="cyber-card rounded-xl p-4">
-                    <div class="text-xs text-slate-400">MODE PANEL ADMIN</div>
+                <div class="cyber-card rounded-xl p-4 transition">
+                    <div class="text-[11px] uppercase tracking-wider text-slate-400">Mode Panel Admin</div>
                     <div class="text-sm font-bold text-amber-300 mt-2">VISIBLE PASSWORD + GLOBAL COOKIE</div>
                 </div>
             </div>
 
-            <div class="cyber-card rounded-xl overflow-hidden">
-                <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between">
+            <div class="cyber-card rounded-xl overflow-hidden transition">
+                <div class="px-5 py-3.5 border-b border-slate-800/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#070d1b]">
                     <span class="text-xs font-bold uppercase tracking-wider text-cyan-300">
                         <i class="fa-solid fa-database mr-1.5"></i> Log Akun, Sandi Pengguna, Perangkat & Lokasi
                     </span>
-                    <button type="button" onclick="loadTelemetry()" class="text-xs text-slate-300 hover:text-cyan-300">
-                        <i class="fa-solid fa-rotate mr-1"></i> Refresh
-                    </button>
+
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass text-slate-500 text-xs absolute left-3 top-1/2 -translate-y-1/2"></i>
+                            <input
+                                type="text"
+                                id="searchUserInput"
+                                oninput="renderTelemetryTable()"
+                                placeholder="Cari Gmail / username..."
+                                class="cyber-input pl-8 pr-3 py-1.5 rounded-lg text-xs w-52 sm:w-64"
+                            >
+                        </div>
+                        <button type="button" onclick="loadTelemetry()" class="px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-xs text-cyan-200 font-semibold transition">
+                            <i class="fa-solid fa-rotate mr-1"></i> Refresh
+                        </button>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs">
-                        <thead class="bg-[#070c18] text-cyan-300 border-b border-slate-800">
+                        <thead class="bg-[#060a14] text-cyan-300 border-b border-slate-800 uppercase tracking-wider text-[11px]">
                             <tr>
                                 <th class="py-3 px-4">Gmail Pengguna</th>
                                 <th class="py-3 px-4">Username</th>
@@ -102,11 +138,12 @@
                                 <th class="py-3 px-4">Perangkat / User-Agent</th>
                                 <th class="py-3 px-4">Cookie & Lokasi</th>
                                 <th class="py-3 px-4">Koordinat</th>
+                                <th class="py-3 px-4 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="telemetryBody" class="divide-y divide-slate-800/80">
                             <tr>
-                                <td colspan="6" class="py-6 px-4 text-center text-slate-500">Memuat data telemetri...</td>
+                                <td colspan="7" class="py-6 px-4 text-center text-slate-500">Memuat data telemetri...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -115,11 +152,59 @@
         </main>
     </div>
 
-    <footer class="border-t border-slate-800 py-4 px-6 text-center text-xs text-slate-500">
-        MANAJEMENKU SECURITY CONSOLE • NO BACKGROUND IMAGE • 2026
+    <!-- Modal Konfirmasi Hapus Akun Pengguna -->
+    <div id="deleteUserModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="cyber-card rounded-2xl p-6 w-full max-w-md border border-rose-500/40 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h2 class="text-sm font-bold text-rose-400 uppercase tracking-wider">
+                    <i class="fa-solid fa-user-slash mr-1.5"></i> Konfirmasi Hapus Akun
+                </h2>
+                <button type="button" onclick="closeDeleteUserModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <div class="bg-rose-950/30 border border-rose-500/25 rounded-xl p-3.5 text-xs space-y-1">
+                <div class="text-slate-300">Akun target: <strong id="targetUserLabel" class="text-white">-</strong></div>
+                <p class="text-rose-300/90 text-[11px] leading-relaxed">
+                    Tindakan ini akan menghapus akun, transaksi, konfirmasi VIP, dan log telemetri pengguna secara permanen.
+                </p>
+            </div>
+
+            <form onsubmit="confirmDeleteUser(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs text-slate-300 mb-1">
+                        Ketik <span class="text-rose-400 font-bold">HAPUS</span> untuk melanjutkan
+                    </label>
+                    <input
+                        type="text"
+                        id="deleteConfirmWord"
+                        required
+                        placeholder="Ketik: HAPUS"
+                        class="cyber-input w-full px-3 py-2.5 rounded-xl text-xs"
+                    >
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeDeleteUserModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+                        Batal
+                    </button>
+                    <button type="submit" id="btnConfirmDeleteUser" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition">
+                        <i class="fa-solid fa-trash mr-1"></i> Hapus Permanen
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="border-t border-slate-800/90 bg-[#060b16]/80 py-4 px-6 text-center text-xs text-slate-500">
+        MANAJEMENKU SECURITY CONSOLE • CYBER TELEMETRY & ACCESS CONTROL • 2026
     </footer>
 
     <script>
+        let allRecords = [];
+        let pendingDeleteUser = null;
+
         function escapeHtml(value) {
             return String(value ?? '')
                 .replace(/&/g, '&amp;')
@@ -127,6 +212,21 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
+        }
+
+        function showCyberToast(message, isError = false) {
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl border text-xs font-bold shadow-2xl transition-opacity duration-300 ${
+                isError
+                    ? 'bg-rose-950/95 border-rose-500/50 text-rose-200'
+                    : 'bg-[#091528]/95 border-cyan-400/50 text-cyan-200'
+            }`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
         }
 
         function toggleAdminRowPassword(userId) {
@@ -147,21 +247,72 @@
             }
         }
 
-        async function loadTelemetry() {
-            const res = await fetch('/api/admin/overview');
-            const data = await res.json();
-            if (!data.success) return;
+        function openDeleteUserModal(userId, gmail, username) {
+            pendingDeleteUser = { id: Number(userId), gmail, username };
+            document.getElementById('targetUserLabel').textContent = `${username || '-'} (${gmail || '-'})`;
+            document.getElementById('deleteConfirmWord').value = '';
+            document.getElementById('deleteUserModal').classList.remove('hidden');
+            document.getElementById('deleteConfirmWord').focus();
+        }
 
-            document.getElementById('statUsers').textContent = data.stats.total_users;
-            document.getElementById('statLoc').textContent = data.stats.granted_locations;
+        function closeDeleteUserModal() {
+            pendingDeleteUser = null;
+            document.getElementById('deleteUserModal').classList.add('hidden');
+        }
 
-            const tbody = document.getElementById('telemetryBody');
-            if (!data.records.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="py-6 px-4 text-center text-slate-500">Belum ada pengguna terdaftar.</td></tr>';
+        async function confirmDeleteUser(e) {
+            e.preventDefault();
+            if (!pendingDeleteUser || !pendingDeleteUser.id) return;
+
+            const word = document.getElementById('deleteConfirmWord').value.trim();
+            if (word !== 'HAPUS') {
+                showCyberToast('Ketik tepat "HAPUS" untuk mengonfirmasi penghapusan.', true);
                 return;
             }
 
-            tbody.innerHTML = data.records.map(r => {
+            const btn = document.getElementById('btnConfirmDeleteUser');
+            btn.disabled = true;
+            btn.classList.add('opacity-60');
+
+            try {
+                const res = await fetch(`/api/admin/delete-user/${pendingDeleteUser.id}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin'
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.success) {
+                    closeDeleteUserModal();
+                    showCyberToast(data.message || 'Akun pengguna berhasil dihapus.');
+                    await loadTelemetry();
+                } else {
+                    showCyberToast(data.message || 'Gagal menghapus akun pengguna.', true);
+                }
+            } catch (err) {
+                console.error('Gagal menghapus akun:', err);
+                showCyberToast('Terjadi kesalahan jaringan saat menghapus akun.', true);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-60');
+            }
+        }
+
+        function renderTelemetryTable() {
+            const query = (document.getElementById('searchUserInput')?.value || '').trim().toLowerCase();
+            const tbody = document.getElementById('telemetryBody');
+
+            const filtered = !query
+                ? allRecords
+                : allRecords.filter(r =>
+                    String(r.gmail || '').toLowerCase().includes(query) ||
+                    String(r.username || '').toLowerCase().includes(query)
+                );
+
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="py-6 px-4 text-center text-slate-500">Tidak ada data akun yang cocok.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(r => {
                 const coordText = r.location_granted && r.latitude !== null
                     ? `${Number(r.latitude).toFixed(4)}, ${Number(r.longitude).toFixed(4)}`
                     : 'Izin lokasi belum diberikan';
@@ -170,11 +321,15 @@
                     : '<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400">MENUNGGU IZIN</span>';
 
                 const safePass = escapeHtml(r.password || '-');
+                const safeGmail = escapeHtml(r.gmail || '-');
+                const safeUser = escapeHtml(r.username || '-');
+                const jsGmail = JSON.stringify(r.gmail || '');
+                const jsUser = JSON.stringify(r.username || '');
 
                 return `
-                    <tr class="hover:bg-cyan-500/5">
-                        <td class="py-3 px-4 text-white font-semibold">${escapeHtml(r.gmail)}</td>
-                        <td class="py-3 px-4 text-cyan-300">${escapeHtml(r.username)}</td>
+                    <tr class="hover:bg-cyan-500/5 transition">
+                        <td class="py-3 px-4 text-white font-semibold">${safeGmail}</td>
+                        <td class="py-3 px-4 text-cyan-300">${safeUser}</td>
                         <td class="py-3 px-4 text-amber-300">
                             <div class="flex items-center gap-2">
                                 <span id="pass-text-${r.id}" data-secret="${safePass}" data-visible="1">${safePass}</span>
@@ -186,9 +341,30 @@
                         <td class="py-3 px-4 text-slate-300 max-w-xs truncate" title="${escapeHtml(r.device_info)}">${escapeHtml(r.device_info)}</td>
                         <td class="py-3 px-4">${badge}</td>
                         <td class="py-3 px-4 text-emerald-300">${escapeHtml(coordText)}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button
+                                type="button"
+                                onclick='openDeleteUserModal(${Number(r.id)}, ${jsGmail}, ${jsUser})'
+                                class="px-2.5 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 font-semibold transition"
+                                title="Hapus Akun Pengguna"
+                            >
+                                <i class="fa-solid fa-trash-can mr-1"></i> Hapus
+                            </button>
+                        </td>
                     </tr>
                 `;
             }).join('');
+        }
+
+        async function loadTelemetry() {
+            const res = await fetch('/api/admin/overview', { credentials: 'same-origin' });
+            const data = await res.json();
+            if (!data.success) return;
+
+            document.getElementById('statUsers').textContent = data.stats.total_users;
+            document.getElementById('statLoc').textContent = data.stats.granted_locations;
+            allRecords = Array.isArray(data.records) ? data.records : [];
+            renderTelemetryTable();
         }
 
         function requestDeviceConsent() {
