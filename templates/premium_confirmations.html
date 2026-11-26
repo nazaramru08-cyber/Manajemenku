@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Verification — VIP Payment Confirmations | Manajemenku</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hidden { display: none !important; }
+        body {
+            background-color: #050811;
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.08), transparent 40%),
+                radial-gradient(circle at 85% 20%, rgba(16, 185, 129, 0.07), transparent 40%),
+                linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
+            color: #e2e8f0;
+            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+        }
+        .cyber-panel {
+            background: rgba(9, 14, 28, 0.9);
+            border: 1px solid rgba(34, 211, 238, 0.18);
+            box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.8), 0 12px 32px rgba(0, 0, 0, 0.55);
+        }
+        .cyber-panel-emerald {
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+        .cyber-panel-amber {
+            border-color: rgba(245, 158, 11, 0.25);
+        }
+        .mono {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .pulse-dot {
+            box-shadow: 0 0 10px #22d3ee;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top SOC Bar -->
+    <header class="border-b border-cyan-500/20 bg-[#070b16]/90 backdrop-blur-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-400/40 flex items-center justify-center text-cyan-300">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold tracking-wider text-sm sm:text-base text-cyan-300 mono">MANAJEMENKU // SOC-VIP</span>
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 pulse-dot animate-pulse"></span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mono">DANA Payment Audit & Privilege Escalation</p>
+                </div>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-2 text-xs font-semibold">
+                <a href="/admin/users" class="px-3 py-2 rounded-lg border border-slate-800 bg-slate-900/70 text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition">
+                    <i class="fa-solid fa-users-gear mr-1"></i> Users & Telemetry
+                </a>
+                <a href="/admin/analytics" class="px-3 py-2 rounded-lg border border-slate-800 bg-slate-900/70 text-slate-300 hover:border-cyan-500/40 hover:text-cyan-200 transition">
+                    <i class="fa-solid fa-earth-asia mr-1"></i> Globe Analytics
+                </a>
+                <a href="/admin/premium-confirmations" class="px-3 py-2 rounded-lg border border-cyan-400/50 bg-cyan-500/15 text-cyan-200">
+                    <i class="fa-solid fa-vault mr-1"></i> VIP Confirmations
+                </a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden sm:block">
+                    <div class="text-xs font-bold text-slate-200">{{ admin_name or 'Admin Manajemenku' }}</div>
+                    <div class="text-[10px] text-cyan-400/80 mono">{{ admin_email or 'ADMIN_SESSION_ACTIVE' }}</div>
+                </div>
+                <button type="button" onclick="loadConfirmations()" class="px-3 py-2 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/30 text-cyan-200 text-xs font-semibold transition" title="Refresh data">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+                <a href="/admin/logout" class="px-3 py-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 text-xs font-semibold transition">
+                    <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Console -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
+
+        <!-- Title & Security Notice -->
+        <div class="cyber-panel rounded-2xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-400/30 text-[11px] text-cyan-300 mono">
+                    <i class="fa-solid fa-terminal"></i> PRIVILEGE_VERIFICATION_QUEUE
+                </div>
+                <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">Verifikasi Konfirmasi Pembayaran VIP (DANA QR)</h1>
+                <p class="text-xs text-slate-400">Cocokkan mutasi masuk di aplikasi DANA (nominal standar Rp 25.000) sebelum mengeskalasi hak akses akun menjadi <span class="text-emerald-300 font-semibold">VIP_PREMIUM</span>.</p>
+            </div>
+            <div class="bg-amber-500/10 border border-amber-400/30 rounded-xl p-3 text-xs text-amber-200 max-w-md">
+                <div class="font-bold flex items-center gap-1.5 mb-0.5"><i class="fa-solid fa-triangle-exclamation"></i> Kontrol Integritas Pembayaran</div>
+                <p class="text-[11px] text-amber-200/80 leading-relaxed">Jangan menyetujui permintaan apabila dana belum terverifikasi masuk di DANA. Persetujuan akan mengubah <span class="mono">is_premium = 1</span> secara permanen.</p>
+            </div>
+        </div>
+
+        <!-- Telemetry Counters -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="cyber-panel rounded-2xl p-4">
+                <div class="text-[11px] text-slate-400 mono uppercase">Total Submissions</div>
+                <div id="countAll" class="text-2xl font-extrabold text-white mt-1 mono">0</div>
+                <div class="text-[11px] text-cyan-400 mt-1">Semua riwayat konfirmasi</div>
+            </div>
+            <div class="cyber-panel cyber-panel-amber rounded-2xl p-4">
+                <div class="text-[11px] text-amber-300/90 mono uppercase">Pending Audit</div>
+                <div id="countPending" class="text-2xl font-extrabold text-amber-400 mt-1 mono">0</div>
+                <div class="text-[11px] text-slate-400 mt-1">Menunggu verifikasi admin</div>
+            </div>
+            <div class="cyber-panel cyber-panel-emerald rounded-2xl p-4">
+                <div class="text-[11px] text-emerald-300/90 mono uppercase">Approved VIP</div>
+                <div id="countApproved" class="text-2xl font-extrabold text-emerald-400 mt-1 mono">0</div>
+                <div class="text-[11px] text-slate-400 mt-1">Akun telah diaktifkan VIP</div>
+            </div>
+            <div class="cyber-panel rounded-2xl p-4 border-rose-500/25">
+                <div class="text-[11px] text-rose-300/90 mono uppercase">Rejected</div>
+                <div id="countRejected" class="text-2xl font-extrabold text-rose-400 mt-1 mono">0</div>
+                <div class="text-[11px] text-slate-400 mt-1">Pengajuan ditolak</div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="cyber-panel rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2 text-xs font-semibold mono">
+                <button type="button" onclick="changeFilter('all')" id="tab-all" class="px-3.5 py-2 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-200">ALL</button>
+                <button type="button" onclick="changeFilter('pending')" id="tab-pending" class="px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-amber-300">PENDING</button>
+                <button type="button" onclick="changeFilter('approved')" id="tab-approved" class="px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-emerald-300">APPROVED</button>
+                <button type="button" onclick="changeFilter('rejected')" id="tab-rejected" class="px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-rose-300">REJECTED</button>
+            </div>
+
+            <div class="relative w-full sm:w-72">
+                <i class="fa-solid fa-magnifying-glass text-slate-500 text-xs absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="searchInput" oninput="renderTable()" placeholder="Cari pengirim, email, atau catatan..." class="w-full bg-slate-950/90 border border-slate-800 focus:border-cyan-400/60 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-200 placeholder-slate-500 outline-none">
+            </div>
+        </div>
+
+        <!-- Queue Table -->
+        <div class="cyber-panel rounded-2xl overflow-hidden">
+            <div class="px-5 py-3.5 border-b border-slate-800/80 flex items-center justify-between text-xs mono text-slate-400">
+                <span><i class="fa-solid fa-table-list text-cyan-400 mr-1.5"></i> PAYMENT_CONFIRMATION_STREAM</span>
+                <span id="lastSyncText">SYNC: --:--:--</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-950/90 text-cyan-300/80 mono uppercase text-[11px] border-b border-slate-800">
+                        <tr>
+                            <th class="py-3.5 px-4">ID</th>
+                            <th class="py-3.5 px-4">Akun Pengguna</th>
+                            <th class="py-3.5 px-4">Pengirim DANA</th>
+                            <th class="py-3.5 px-4">Catatan / Referensi</th>
+                            <th class="py-3.5 px-4">Nominal & Metode</th>
+                            <th class="py-3.5 px-4">Waktu Kirim</th>
+                            <th class="py-3.5 px-4">Status</th>
+                            <th class="py-3.5 px-4 text-right">Tindakan Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody id="confirmationsBody" class="divide-y divide-slate-800/70 text-slate-300">
+                        <tr>
+                            <td colspan="8" class="py-10 text-center text-slate-500 mono">Memuat data antrean konfirmasi...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toastBox" class="fixed bottom-5 right-5 z-50 space-y-2 max-w-sm"></div>
+
+    <script>
+        let allItems = [];
+        let currentFilter = 'all';
+
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function showToast(message, isError = false) {
+            const box = document.getElementById('toastBox');
+            const el = document.createElement('div');
+            el.className = `px-4 py-3 rounded-xl border text-xs font-semibold mono shadow-2xl transition-opacity duration-300 ${
+                isError
+                    ? 'bg-rose-950/95 border-rose-500/50 text-rose-200'
+                    : 'bg-slate-950/95 border-cyan-400/50 text-cyan-200'
+            }`;
+            el.textContent = message;
+            box.appendChild(el);
+            setTimeout(() => {
+                el.classList.add('opacity-0');
+                setTimeout(() => el.remove(), 300);
+            }, 3200);
+        }
+
+        function formatRp(num) {
+            return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+        }
+
+        function formatDateTime(isoStr) {
+            if (!isoStr) return '-';
+            const d = new Date(isoStr);
+            if (Number.isNaN(d.getTime())) return String(isoStr);
+            return d.toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
+        }
+
+        function updateCounters(items) {
+            document.getElementById('countAll').textContent = items.length;
+            document.getElementById('countPending').textContent = items.filter(i => i.status === 'pending').length;
+            document.getElementById('countApproved').textContent = items.filter(i => i.status === 'approved').length;
+            document.getElementById('countRejected').textContent = items.filter(i => i.status === 'rejected').length;
+        }
+
+        function changeFilter(mode) {
+            currentFilter = mode;
+            ['all', 'pending', 'approved', 'rejected'].forEach(key => {
+                const btn = document.getElementById('tab-' + key);
+                if (!btn) return;
+                if (key === mode) {
+                    btn.className = 'px-3.5 py-2 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-200';
+                } else {
+                    btn.className = 'px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-cyan-200';
+                }
+            });
+            renderTable();
+        }
+
+        function renderBadge(status) {
+            if (status === 'approved') {
+                return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"><i class="fa-solid fa-circle-check"></i> APPROVED</span>`;
+            }
+            if (status === 'rejected') {
+                return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold mono bg-rose-500/15 text-rose-300 border border-rose-500/30"><i class="fa-solid fa-circle-xmark"></i> REJECTED</span>`;
+            }
+            return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold mono bg-amber-500/15 text-amber-300 border border-amber-500/30"><i class="fa-solid fa-clock"></i> PENDING</span>`;
+        }
+
+        function renderTable() {
+            const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+            const tbody = document.getElementById('confirmationsBody');
+
+            const filtered = allItems.filter(item => {
+                const matchStatus = currentFilter === 'all' || item.status === currentFilter;
+                if (!matchStatus) return false;
+                if (!q) return true;
+                const haystack = [
+                    item.id,
+                    item.sender_name,
+                    item.payment_note,
+                    item.user_gmail,
+                    item.username,
+                    item.status
+                ].join(' ').toLowerCase();
+                return haystack.includes(q);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="py-10 text-center text-slate-500 mono">Tidak ada data konfirmasi sesuai filter.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => {
+                const safeId = Number(item.id);
+                const isPending = item.status === 'pending';
+
+                const actionsHtml = isPending
+                    ? `
+                        <div class="inline-flex items-center justify-end gap-2">
+                            <button type="button" onclick="decideConfirmation(${safeId}, 'approve')" class="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 font-semibold text-xs transition">
+                                <i class="fa-solid fa-check mr-1"></i> Setujui VIP
+                            </button>
+                            <button type="button" onclick="decideConfirmation(${safeId}, 'reject')" class="px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 font-semibold text-xs transition">
+                                <i class="fa-solid fa-xmark mr-1"></i> Tolak
+                            </button>
+                        </div>
+                    `
+                    : `<span class="text-[11px] text-slate-500 mono">Verified: ${escapeHtml(formatDateTime(item.verified_at))}</span>`;
+
+                return `
+                    <tr class="hover:bg-cyan-500/[0.04] transition">
+                        <td class="py-3.5 px-4 mono text-cyan-300 font-bold">#${safeId}</td>
+                        <td class="py-3.5 px-4">
+                            <div class="font-semibold text-white">${escapeHtml(item.username || 'User #' + item.user_id)}</div>
+                            <div class="text-[11px] text-slate-400 mono">${escapeHtml(item.user_gmail || '-')}</div>
+                        </td>
+                        <td class="py-3.5 px-4 font-semibold text-slate-100">${escapeHtml(item.sender_name)}</td>
+                        <td class="py-3.5 px-4 text-slate-300 max-w-xs break-words">${escapeHtml(item.payment_note)}</td>
+                        <td class="py-3.5 px-4 mono">
+                            <div class="text-emerald-300 font-bold">${formatRp(item.amount)}</div>
+                            <div class="text-[10px] text-slate-400">${escapeHtml(item.method || 'DANA_QR')}</div>
+                        </td>
+                        <td class="py-3.5 px-4 mono text-[11px] text-slate-400">${escapeHtml(formatDateTime(item.created_at))}</td>
+                        <td class="py-3.5 px-4">${renderBadge(item.status)}</td>
+                        <td class="py-3.5 px-4 text-right whitespace-nowrap">${actionsHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function loadConfirmations() {
+            try {
+                const res = await fetch('/api/admin/premium-confirmations', { credentials: 'same-origin' });
+                if (!res.ok) {
+                    showToast('Gagal memuat daftar konfirmasi (cek sesi admin).', true);
+                    return;
+                }
+                const data = await res.json();
+                allItems = Array.isArray(data.confirmations) ? data.confirmations : [];
+                updateCounters(allItems);
+                renderTable();
+                const now = new Date();
+                document.getElementById('lastSyncText').textContent = 'SYNC: ' + now.toLocaleTimeString('id-ID');
+            } catch (err) {
+                console.error('Error memuat konfirmasi:', err);
+                showToast('Terjadi kesalahan jaringan saat memuat antrean.', true);
+            }
+        }
+
+        async function decideConfirmation(id, action) {
+            const safeId = Number(id);
+            if (!Number.isFinite(safeId) || safeId <= 0) return;
+
+            const endpoint = action === 'approve'
+                ? `/api/admin/approve-premium/${safeId}`
+                : `/api/admin/reject-premium/${safeId}`;
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.success) {
+                    showToast(data.message || `Status #${safeId} diperbarui.`);
+                    await loadConfirmations();
+                } else {
+                    showToast(data.message || 'Gagal memperbarui status konfirmasi.', true);
+                }
+            } catch (err) {
+                console.error('Error keputusan admin:', err);
+                showToast('Terjadi kesalahan saat memproses tindakan.', true);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadConfirmations);
+    </script>
+</body>
+</html>
