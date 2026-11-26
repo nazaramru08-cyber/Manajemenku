@@ -11,33 +11,99 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         body {
-            background-color: #050811;
+            background-color: #030711;
             color: #e2e8f0;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            overflow-x: hidden;
+        }
+        #cyberOceanCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.78;
+        }
+        .page-layer {
+            position: relative;
+            z-index: 10;
         }
         .cyber-card {
-            background: #091020;
-            border: 1px solid rgba(34, 211, 238, 0.22);
+            background: rgba(8, 15, 31, 0.84);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(34, 211, 238, 0.25);
+            box-shadow: 0 0 28px rgba(6, 182, 212, 0.08);
+            transition: border-color 0.25s ease, transform 0.25s ease;
+        }
+        .cyber-card:hover {
+            border-color: rgba(34, 211, 238, 0.48);
         }
         #worldMap {
             height: 320px;
             width: 100%;
             border-radius: 0.75rem;
-            border: 1px solid rgba(34, 211, 238, 0.25);
+            border: 1px solid rgba(34, 211, 238, 0.28);
             background: #070d1a;
             z-index: 1;
         }
         #worldMap .leaflet-tile-pane {
             filter: invert(92%) hue-rotate(180deg) brightness(85%) contrast(110%);
         }
+
+        /* Animasi CPU */
+        @keyframes cpuPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.45); }
+            50% { transform: scale(1.06); box-shadow: 0 0 18px 3px rgba(34, 211, 238, 0.25); }
+        }
+        .cpu-core-anim {
+            animation: cpuPulse 2.2s infinite ease-in-out;
+        }
+
+        /* Animasi WiFi Waves */
+        @keyframes wifiWave {
+            0% { transform: scale(0.55); opacity: 0.9; }
+            100% { transform: scale(1.45); opacity: 0; }
+        }
+        .wifi-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            border: 1.5px solid rgba(52, 211, 153, 0.75);
+            animation: wifiWave 2.1s infinite ease-out;
+        }
+        .wifi-ring-delay {
+            animation-delay: 1.05s;
+        }
+
+        /* Animasi Hotspot Orbit */
+        @keyframes hotspotSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .hotspot-orbit {
+            animation: hotspotSpin 5s linear infinite;
+        }
+
+        /* Animasi Perangkat Admin */
+        @keyframes deviceScan {
+            0%, 100% { transform: translateY(0px); filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.45)); }
+            50% { transform: translateY(-3px); filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.55)); }
+        }
+        .device-float-anim {
+            animation: deviceScan 3s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
-    <div>
-        <header class="border-b border-cyan-500/20 bg-[#070c18] px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+    <!-- Animasi Jaringan Internet Seperti Laut -->
+    <canvas id="cyberOceanCanvas"></canvas>
+
+    <div class="page-layer">
+        <header class="border-b border-cyan-500/25 bg-[#060c18]/85 backdrop-blur-md px-6 py-4 flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">
                 <span class="px-2.5 py-1 rounded bg-cyan-500/15 border border-cyan-400/40 text-cyan-300 text-xs font-bold">
-                    GLOBAL VISUALIZER
+                    <i class="fa-solid fa-shield-halved mr-1"></i> GLOBAL VISUALIZER
                 </span>
                 <div>
                     <h1 class="text-base sm:text-lg font-bold text-white">{{ admin_name }}</h1>
@@ -46,72 +112,299 @@
             </div>
 
             <nav class="flex flex-wrap items-center gap-2 text-xs">
-                <a href="/admin/users" class="px-3 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300">
+                <a href="/admin/users" class="px-3 py-2 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-300 transition">
                     <i class="fa-solid fa-users-viewfinder mr-1"></i> Akun & Perangkat
                 </a>
                 <a href="/admin/analytics" class="px-3 py-2 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 font-semibold">
                     <i class="fa-solid fa-map-location-dot mr-1"></i> Diagram & Peta Lokasi
                 </a>
-                <a href="/admin/premium-confirmations" class="px-3 py-2 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-amber-200 font-semibold">
+                <a href="/admin/premium-confirmations" class="px-3 py-2 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-amber-200 font-semibold transition">
                     <i class="fa-solid fa-crown mr-1"></i> VIP Confirmations
                 </a>
-                <a href="/admin/logout" class="px-3 py-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300">
+                <a href="/admin/logout" class="px-3 py-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 transition">
                     <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
                 </a>
             </nav>
         </header>
 
-        <main class="max-w-7xl mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Panel 1: Diagram Jumlah Pengguna -->
-            <div class="cyber-card rounded-2xl p-6 space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <main class="max-w-7xl mx-auto px-6 py-6 space-y-6">
+            <!-- Panel Animasi Cyber: CPU, WiFi, Hotspot & Perangkat Admin -->
+            <section class="cyber-card rounded-2xl p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/90 pb-3">
                     <div>
-                        <h2 class="text-sm font-bold text-cyan-300 uppercase tracking-wider">
-                            <i class="fa-solid fa-chart-column mr-1.5"></i> Diagram Jumlah Pengguna
+                        <h2 class="text-xs sm:text-sm font-bold text-cyan-300 uppercase tracking-wider">
+                            <i class="fa-solid fa-microchip mr-1.5"></i> Cyber Node Telemetry — CPU, WiFi, Hotspot & Perangkat Aktif
                         </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Distribusi akun terdaftar, VIP Premium, dan transaksi</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Visualisasi simulasi beban node, gelombang jaringan nirkabel, dan perangkat sesi admin saat ini</p>
                     </div>
-                    <span id="totalBadge" class="px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-300 text-xs font-bold">0 User</span>
+                    <span class="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold">
+                        ● OCEAN NET LINK ACTIVE
+                    </span>
                 </div>
 
-                <div class="h-72">
-                    <canvas id="userChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Panel 2: Peta Dunia & Penanda Lokasi Pengguna -->
-            <div class="cyber-card rounded-2xl p-6 space-y-4 flex flex-col justify-between">
-                <div class="w-full flex items-center justify-between border-b border-slate-800 pb-3">
-                    <div>
-                        <h2 class="text-sm font-bold text-emerald-300 uppercase tracking-wider">
-                            <i class="fa-solid fa-map-location-dot mr-1.5"></i> Peta Dunia Lokasi Pengguna
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-0.5">Otomatis tertanda untuk pengunjung dengan izin cookie & lokasi aktif</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    <!-- 1. Animasi CPU -->
+                    <div class="bg-[#060c19]/90 border border-cyan-500/25 rounded-xl p-4 flex flex-col justify-between gap-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-xl bg-cyan-500/15 border border-cyan-400/40 flex items-center justify-center text-cyan-300 cpu-core-anim">
+                                    <i class="fa-solid fa-microchip text-lg"></i>
+                                </div>
+                                <div>
+                                    <div class="text-[11px] text-slate-400 uppercase">CPU Node</div>
+                                    <div id="cpuLoadText" class="text-base font-bold text-cyan-300">28%</div>
+                                </div>
+                            </div>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/25">8 CORE</span>
+                        </div>
+                        <div>
+                            <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                                <div id="cpuLoadBar" class="h-full bg-gradient-to-r from-cyan-400 to-indigo-400 transition-all duration-500" style="width: 28%;"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-slate-400 mt-1.5">
+                                <span>Freq: 3.4 GHz</span>
+                                <span id="cpuTempText" class="text-cyan-200">44°C</span>
+                            </div>
+                        </div>
                     </div>
-                    <span id="pinCountBadge" class="text-xs text-emerald-400">● 0 Titik Aktif</span>
+
+                    <!-- 2. Animasi WiFi -->
+                    <div class="bg-[#060c19]/90 border border-emerald-500/25 rounded-xl p-4 flex flex-col justify-between gap-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="relative w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-400/40 flex items-center justify-center text-emerald-300">
+                                    <span class="wifi-ring"></span>
+                                    <span class="wifi-ring wifi-ring-delay"></span>
+                                    <i class="fa-solid fa-wifi text-base relative z-10"></i>
+                                </div>
+                                <div>
+                                    <div class="text-[11px] text-slate-400 uppercase">WiFi Link</div>
+                                    <div id="wifiSignalText" class="text-base font-bold text-emerald-300">-42 dBm</div>
+                                </div>
+                            </div>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/25">5 GHz</span>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800/80 pt-2">
+                            <span>Beacon Pulse</span>
+                            <span id="wifiLatencyText" class="text-emerald-300 font-semibold">14 ms</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Animasi Hotspot -->
+                    <div class="bg-[#060c19]/90 border border-amber-500/25 rounded-xl p-4 flex flex-col justify-between gap-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="relative w-11 h-11 rounded-xl bg-amber-500/15 border border-amber-400/40 flex items-center justify-center text-amber-300">
+                                    <span class="absolute inset-1 rounded-full border border-dashed border-amber-400/60 hotspot-orbit"></span>
+                                    <i class="fa-solid fa-tower-broadcast text-base relative z-10"></i>
+                                </div>
+                                <div>
+                                    <div class="text-[11px] text-slate-400 uppercase">Hotspot AP</div>
+                                    <div class="text-sm font-bold text-amber-300">SEC-HOTSPOT-01</div>
+                                </div>
+                            </div>
+                            <span id="hotspotClientsText" class="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/25">3 Peers</span>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800/80 pt-2">
+                            <span>Encryption</span>
+                            <span class="text-amber-200 font-semibold">WPA3-AES</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. Animasi Perangkat Admin / Kamu -->
+                    <div class="bg-[#060c19]/90 border border-purple-500/30 rounded-xl p-4 flex flex-col justify-between gap-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-11 h-11 rounded-xl bg-purple-500/15 border border-purple-400/40 flex items-center justify-center text-purple-300 shrink-0 device-float-anim">
+                                    <i id="activeDeviceIcon" class="fa-solid fa-laptop-code text-lg"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-[11px] text-slate-400 uppercase">Perangkat Kamu</div>
+                                    <div id="activeDeviceTitle" class="text-sm font-bold text-purple-200 truncate">Terminal Desktop</div>
+                                </div>
+                            </div>
+                            <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-400/30 shrink-0">ADMIN</span>
+                        </div>
+                        <div id="activeDeviceMeta" class="text-[11px] text-slate-400 truncate border-t border-slate-800/80 pt-2" title="">
+                            Mendeteksi spesifikasi perangkat...
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Grid Diagram & Peta Lokasi -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Panel 1: Diagram Jumlah Pengguna -->
+                <div class="cyber-card rounded-2xl p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="text-sm font-bold text-cyan-300 uppercase tracking-wider">
+                                <i class="fa-solid fa-chart-column mr-1.5"></i> Diagram Jumlah Pengguna
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Distribusi akun terdaftar, VIP Premium, dan transaksi</p>
+                        </div>
+                        <span id="totalBadge" class="px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-300 text-xs font-bold">0 User</span>
+                    </div>
+
+                    <div class="h-72">
+                        <canvas id="userChart"></canvas>
+                    </div>
                 </div>
 
-                <div id="worldMap"></div>
-
-                <div class="w-full grid grid-cols-2 gap-3 text-xs pt-2 border-t border-slate-800">
-                    <div class="bg-[#070c18] p-3 rounded-xl border border-slate-800">
-                        <div class="text-slate-400">IZIN LOKASI AKTIF</div>
-                        <div id="globeLocCount" class="text-base font-bold text-emerald-400 mt-0.5">0</div>
+                <!-- Panel 2: Peta Dunia & Penanda Lokasi Pengguna -->
+                <div class="cyber-card rounded-2xl p-6 space-y-4 flex flex-col justify-between">
+                    <div class="w-full flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="text-sm font-bold text-emerald-300 uppercase tracking-wider">
+                                <i class="fa-solid fa-map-location-dot mr-1.5"></i> Peta Dunia Lokasi Pengguna
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-0.5">Otomatis tertanda untuk pengunjung dengan izin cookie & lokasi aktif</p>
+                        </div>
+                        <span id="pinCountBadge" class="text-xs text-emerald-400">● 0 Titik Aktif</span>
                     </div>
-                    <div class="bg-[#070c18] p-3 rounded-xl border border-slate-800">
-                        <div class="text-slate-400">TOTAL TRANSAKSI</div>
-                        <div id="globeTxCount" class="text-base font-bold text-cyan-300 mt-0.5">0</div>
+
+                    <div id="worldMap"></div>
+
+                    <div class="w-full grid grid-cols-2 gap-3 text-xs pt-2 border-t border-slate-800">
+                        <div class="bg-[#070c18]/90 p-3 rounded-xl border border-slate-800">
+                            <div class="text-slate-400">IZIN LOKASI AKTIF</div>
+                            <div id="globeLocCount" class="text-base font-bold text-emerald-400 mt-0.5">0</div>
+                        </div>
+                        <div class="bg-[#070c18]/90 p-3 rounded-xl border border-slate-800">
+                            <div class="text-slate-400">TOTAL TRANSAKSI</div>
+                            <div id="globeTxCount" class="text-base font-bold text-cyan-300 mt-0.5">0</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <footer class="border-t border-slate-800 py-4 px-6 text-center text-xs text-slate-500">
-        MANAJEMENKU WORLD MAP TELEMETRY • NO BACKGROUND IMAGE • 2026
+    <footer class="page-layer border-t border-slate-800/90 bg-[#050a14]/80 backdrop-blur-md py-4 px-6 text-center text-xs text-slate-500">
+        MANAJEMENKU WORLD MAP TELEMETRY • CYBER OCEAN NETWORK • 2026
     </footer>
 
     <script>
+        /* Animasi Jaringan Internet Seperti Laut */
+        (function initCyberOceanCanvas() {
+            const canvas = document.getElementById('cyberOceanCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width = 0;
+            let height = 0;
+            let tick = 0;
+
+            const waves = [
+                { amp: 22, freq: 0.0065, speed: 0.018, yOffset: 0.28, color: 'rgba(34, 211, 238, 0.22)' },
+                { amp: 28, freq: 0.0052, speed: -0.014, yOffset: 0.50, color: 'rgba(59, 130, 246, 0.18)' },
+                { amp: 20, freq: 0.0078, speed: 0.022, yOffset: 0.72, color: 'rgba(16, 185, 129, 0.16)' },
+                { amp: 26, freq: 0.0046, speed: -0.011, yOffset: 0.88, color: 'rgba(139, 92, 246, 0.15)' }
+            ];
+
+            const packets = Array.from({ length: 24 }, (_, idx) => ({
+                x: Math.random() * 1400,
+                waveIdx: idx % waves.length,
+                speed: 1.1 + Math.random() * 1.8,
+                radius: 2 + Math.random() * 2.2
+            }));
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+
+            function getWaveY(w, x) {
+                return height * w.yOffset + Math.sin(x * w.freq + tick * w.speed) * w.amp + Math.cos(x * w.freq * 0.5 - tick * w.speed * 0.7) * (w.amp * 0.45);
+            }
+
+            function draw() {
+                tick += 1;
+                ctx.clearRect(0, 0, width, height);
+
+                waves.forEach((w) => {
+                    ctx.beginPath();
+                    for (let x = 0; x <= width; x += 12) {
+                        const y = getWaveY(w, x);
+                        if (x === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.strokeStyle = w.color;
+                    ctx.lineWidth = 1.6;
+                    ctx.stroke();
+
+                    for (let x = 24; x < width; x += 96) {
+                        const y = getWaveY(w, x);
+                        ctx.beginPath();
+                        ctx.arc(x, y, 2.3, 0, Math.PI * 2);
+                        ctx.fillStyle = w.color;
+                        ctx.fill();
+                    }
+                });
+
+                packets.forEach((p) => {
+                    p.x += p.speed;
+                    if (p.x > width + 20) p.x = -20;
+                    const w = waves[p.waveIdx];
+                    const y = getWaveY(w, p.x);
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(103, 232, 249, 0.72)';
+                    ctx.fill();
+                });
+
+                requestAnimationFrame(draw);
+            }
+
+            resize();
+            window.addEventListener('resize', resize);
+            requestAnimationFrame(draw);
+        })();
+
+        /* Animasi & Info Telemetri CPU, WiFi, Hotspot & Perangkat Admin */
+        (function initCyberNodeWidgets() {
+            const ua = navigator.userAgent || 'Unknown Device';
+            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+            const iconEl = document.getElementById('activeDeviceIcon');
+            const titleEl = document.getElementById('activeDeviceTitle');
+            const metaEl = document.getElementById('activeDeviceMeta');
+
+            if (iconEl && titleEl && metaEl) {
+                if (isMobile) {
+                    iconEl.className = 'fa-solid fa-mobile-screen-button text-lg';
+                    titleEl.textContent = /iPhone|iPad|iPod/i.test(ua) ? 'iOS Device Session' : 'Android Device Session';
+                } else {
+                    iconEl.className = 'fa-solid fa-laptop-code text-lg';
+                    titleEl.textContent = /Windows/i.test(ua) ? 'Windows Workstation' : (/Mac/i.test(ua) ? 'macOS Workstation' : 'Linux / Desktop Node');
+                }
+                const infoText = `${navigator.platform || 'Web'} • ${window.innerWidth}x${window.innerHeight}px • ${ua}`;
+                metaEl.textContent = infoText;
+                metaEl.title = infoText;
+            }
+
+            setInterval(() => {
+                const cpu = Math.floor(19 + Math.random() * 34);
+                const temp = Math.floor(41 + cpu * 0.35);
+                const latency = Math.floor(11 + Math.random() * 19);
+                const dbm = -Math.floor(38 + Math.random() * 14);
+                const peers = Math.floor(2 + Math.random() * 4);
+
+                const cpuText = document.getElementById('cpuLoadText');
+                const cpuBar = document.getElementById('cpuLoadBar');
+                const cpuTemp = document.getElementById('cpuTempText');
+                const wifiSig = document.getElementById('wifiSignalText');
+                const wifiLat = document.getElementById('wifiLatencyText');
+                const hsPeers = document.getElementById('hotspotClientsText');
+
+                if (cpuText) cpuText.textContent = `${cpu}%`;
+                if (cpuBar) cpuBar.style.width = `${cpu}%`;
+                if (cpuTemp) cpuTemp.textContent = `${temp}°C`;
+                if (wifiSig) wifiSig.textContent = `${dbm} dBm`;
+                if (wifiLat) wifiLat.textContent = `${latency} ms`;
+                if (hsPeers) hsPeers.textContent = `${peers} Peers`;
+            }, 2200);
+        })();
+
         let chartInstance = null;
         let worldMap = null;
         let markersLayer = null;
