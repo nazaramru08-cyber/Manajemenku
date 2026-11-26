@@ -272,7 +272,22 @@
 
                 <!-- Kartu Grafik Keuangan -->
                 <div class="glass-card tilt-card p-6 rounded-2xl space-y-4 my-6" data-tilt data-tilt-max="5">
-                    <h3 class="text-white font-bold text-lg">Ringkasan Keuangan Bulanan</h3>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <h3 class="text-white font-bold text-lg">Ringkasan Keuangan Bulanan</h3>
+
+                        <!-- Tombol Pilihan Jenis Diagram -->
+                        <div class="inline-flex rounded-xl bg-gray-900/90 p-1 border border-gray-700/70 self-start sm:self-auto">
+                            <button type="button" id="btnChartLine" onclick="switchChartType('line')"
+                                class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition">
+                                <i class="fa-solid fa-chart-line mr-1"></i> Garis
+                            </button>
+                            <button type="button" id="btnChartBar" onclick="switchChartType('bar')"
+                                class="px-3 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">
+                                <i class="fa-solid fa-chart-column mr-1"></i> Batang
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="w-full h-64">
                         <canvas id="financeChart"></canvas>
                     </div>
@@ -748,56 +763,94 @@
         }
 
         let myFinanceChart = null;
+        let currentChartType = 'line'; // 'line' atau 'bar'
+        let lastChartPayload = { labels: [], income: [], expense: [] };
+
+        function drawFinanceChart(chartData) {
+            const canvas = document.getElementById('financeChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            if (myFinanceChart) {
+                myFinanceChart.destroy();
+            }
+
+            const isBar = currentChartType === 'bar';
+
+            myFinanceChart = new Chart(ctx, {
+                type: currentChartType,
+                data: {
+                    labels: Array.isArray(chartData.labels) ? chartData.labels : [],
+                    datasets: [
+                        {
+                            label: 'Pemasukan (Rp)',
+                            data: Array.isArray(chartData.income) ? chartData.income : [],
+                            borderColor: '#4ade80',
+                            backgroundColor: isBar ? 'rgba(74, 222, 128, 0.75)' : 'rgba(74, 222, 128, 0.1)',
+                            borderWidth: 2,
+                            borderRadius: isBar ? 6 : 0,
+                            fill: !isBar,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Pengeluaran (Rp)',
+                            data: Array.isArray(chartData.expense) ? chartData.expense : [],
+                            borderColor: '#f87171',
+                            backgroundColor: isBar ? 'rgba(248, 113, 113, 0.75)' : 'rgba(248, 113, 113, 0.1)',
+                            borderWidth: 2,
+                            borderRadius: isBar ? 6 : 0,
+                            fill: !isBar,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        function switchChartType(type) {
+            if (type !== 'line' && type !== 'bar') return;
+            currentChartType = type;
+
+            const btnLine = document.getElementById('btnChartLine');
+            const btnBar = document.getElementById('btnChartBar');
+
+            if (btnLine && btnBar) {
+                if (type === 'line') {
+                    btnLine.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition';
+                    btnBar.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition';
+                } else {
+                    btnBar.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition';
+                    btnLine.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition';
+                }
+            }
+
+            drawFinanceChart(lastChartPayload);
+        }
 
         async function updateChart() {
             try {
                 const res = await fetch('/api/chart-data', { credentials: 'same-origin' });
                 if (!res.ok) return;
                 const chartData = await res.json();
-
-                const ctx = document.getElementById('financeChart').getContext('2d');
-
-                if (myFinanceChart) {
-                    myFinanceChart.destroy();
-                }
-
-                myFinanceChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: Array.isArray(chartData.labels) ? chartData.labels : [],
-                        datasets: [
-                            {
-                                label: 'Pemasukan (Rp)',
-                                data: Array.isArray(chartData.income) ? chartData.income : [],
-                                borderColor: '#4ade80',
-                                backgroundColor: 'rgba(74, 222, 128, 0.1)',
-                                fill: true,
-                                tension: 0.4
-                            },
-                            {
-                                label: 'Pengeluaran (Rp)',
-                                data: Array.isArray(chartData.expense) ? chartData.expense : [],
-                                borderColor: '#f87171',
-                                backgroundColor: 'rgba(248, 113, 113, 0.1)',
-                                fill: true,
-                                tension: 0.4
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                labels: { color: '#ffffff' }
-                            }
-                        },
-                        scales: {
-                            x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                            y: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
-                        }
-                    }
-                });
+                lastChartPayload = {
+                    labels: Array.isArray(chartData.labels) ? chartData.labels : [],
+                    income: Array.isArray(chartData.income) ? chartData.income : [],
+                    expense: Array.isArray(chartData.expense) ? chartData.expense : []
+                };
+                drawFinanceChart(lastChartPayload);
             } catch (err) {
                 console.error('Gagal memuat data grafik:', err);
             }
