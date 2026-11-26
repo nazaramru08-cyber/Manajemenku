@@ -52,6 +52,9 @@
                 <a href="/admin/analytics" class="px-3 py-2 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 font-semibold">
                     <i class="fa-solid fa-map-location-dot mr-1"></i> Diagram & Peta Lokasi
                 </a>
+                <a href="/admin/premium-confirmations" class="px-3 py-2 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-amber-200 font-semibold">
+                    <i class="fa-solid fa-crown mr-1"></i> VIP Confirmations
+                </a>
                 <a href="/admin/logout" class="px-3 py-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300">
                     <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
                 </a>
@@ -181,7 +184,6 @@
                     bounds.push([loc.latitude, loc.longitude]);
                 });
             } else if (Number(grantedCount) > 0) {
-                // Fallback jika /api/admin/overview hanya mengirim jumlah granted_locations tanpa koordinat per user
                 const fallbackMarker = L.circleMarker([-6.8694, 109.1402], {
                     radius: 8,
                     color: '#22d3ee',
