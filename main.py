@@ -894,6 +894,72 @@ def hutang_piutang_page():
 def tentang_kami():
     return render_template("tentang_kami.html", is_vip=session.get("is_vip", False))
 
+@app.route('/admin/premium-confirmations')
+@admin_required
+def admin_premium_confirmations_page():
+    return render_template('premium_confimations.html', admin_name=ADMIN_NAME, admin_email=ADMIN_EMAIL)
+
+
+@app.route('/api/admin/premium-confirmations', methods=['GET'])
+@admin_required
+def list_premium_confirmations():
+    status_filter = (request.args.get('status') or 'all').strip().lower()
+    with get_db_connection() as conn:
+        base_query = '''
+            SELECT
+                c.id,
+                c.user_id,
+                c.sender_name,
+                c.payment_note,
+                c.amount,
+                c.method,
+                c.status,
+                c.created_at,
+                c.verified_at,
+                u.full_name AS user_gmail,
+                u.username AS username,
+                u.is_premium AS user_is_premium
+            FROM premium_payment_confirmations c
+            LEFT JOIN users u ON u.id = c.user_id
+        '''
+        if status_filter in ('pending', 'approved', 'rejected'):
+            rows = conn.execute(base_query + ' WHERE c.status = ? ORDER BY c.id DESC', (status_filter,)).fetchall()
+        else:
+            rows = conn.execute(base_query + ' ORDER BY c.id DESC').fetchall()
+
+    items = []
+    for r in rows:
+        d = dict(r)
+        d['user_is_premium'] = bool(d.get('user_is_premium'))
+        items.append(d)
+
+    return jsonify({'success': True, 'confirmations': items})
+
+
+@app.route('/api/admin/reject-premium/<int:confirmation_id>', methods=['POST'])
+@admin_required
+def reject_premium_confirmation(confirmation_id):
+    now_iso = datetime.now(timezone.utc).isoformat()
+    with get_db_connection() as conn:
+        confirmation = conn.execute('SELECT * FROM premium_payment_confirmations WHERE id = ?', (confirmation_id,)).fetchone()
+        if not confirmation:
+            return jsonify({'success': False, 'message': 'Data konfirmasi tidak ditemukan.'}), 404
+
+        conn.execute('''
+            UPDATE premium_payment_confirmations
+            SET status = 'rejected', verified_at = ?
+            WHERE id = ?
+        ''', (now_iso, confirmation_id))
+        conn.commit()
+
+        updated_conf = conn.execute('SELECT * FROM premium_payment_confirmations WHERE id = ?', (confirmation_id,)).fetchone()
+
+    return jsonify({
+        'success': True,
+        'message': f"Konfirmasi #{confirmation_id} ditolak.",
+        'confirmation': dict(updated_conf)
+    }), 200
+
 
 if __name__ == '__main__':
     app.run(debug=True)
