@@ -9,7 +9,6 @@ import re
 import secrets
 import time
 import smtplib
-import uuid
 from datetime import datetime, timezone
 from functools import wraps
 from email.mime.text import MIMEText
@@ -35,6 +34,7 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 USE_POSTGRES = bool(DATABASE_URL)
 
 GMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@gmail\.com$', re.IGNORECASE)
+AVATAR_DATA_URI_REGEX = re.compile(r'^data:image/(png|jpeg|jpg|webp);base64,([A-Za-z0-9+/=\s]+)$')
 
 
 def is_valid_gmail(email):
@@ -329,34 +329,29 @@ def api_update_avatar():
         if remove_avatar or not avatar_base64:
             conn.execute('UPDATE users SET avatar_url = NULL WHERE id = ?', (user_id,))
             conn.commit()
-            return jsonify({'success': True, 'message': 'Foto profil dikembalikan ke avatar inisial.'})
+            return jsonify({'success': True, 'message': 'Foto profil dikembalikan ke avatar inisial.', 'avatar_url': ''})
 
-        match = re.match(r'^data:image/(png|jpeg|jpg|webp);base64,(.+)$', str(avatar_base64))
+        raw_uri = str(avatar_base64).strip()
+        match = AVATAR_DATA_URI_REGEX.match(raw_uri)
         if not match:
             return jsonify({'success': False, 'message': 'Format gambar tidak didukung (gunakan PNG, JPG, atau WEBP).'}), 400
 
-        ext = 'jpg' if match.group(1) == 'jpeg' else match.group(1)
+        mime_subtype = 'jpeg' if match.group(1).lower() == 'jpg' else match.group(1).lower()
+        clean_b64 = re.sub(r'\s+', '', match.group(2))
+
         try:
-            raw_bytes = base64.b64decode(match.group(2), validate=True)
+            raw_bytes = base64.b64decode(clean_b64, validate=True)
         except Exception:
             return jsonify({'success': False, 'message': 'Data gambar tidak valid.'}), 400
 
-        if len(raw_bytes) > 2 * 1024 * 1024:
-            return jsonify({'success': False, 'message': 'Ukuran gambar melebihi batas maksimal 2 MB.'}), 400
+        if not raw_bytes or len(raw_bytes) > 2 * 1024 * 1024:
+            return jsonify({'success': False, 'message': 'Ukuran gambar harus lebih dari 0 dan maksimal 2 MB.'}), 400
 
-        upload_dir = os.path.join(app.root_path, 'static', 'avatars')
-        os.makedirs(upload_dir, exist_ok=True)
-        filename = f"user_{user_id}_{uuid.uuid4().hex[:8]}.{ext}"
-        filepath = os.path.join(upload_dir, filename)
-
-        with open(filepath, 'wb') as f:
-            f.write(raw_bytes)
-
-        avatar_url = url_for('static', filename=f'avatars/{filename}')
-        conn.execute('UPDATE users SET avatar_url = ? WHERE id = ?', (avatar_url, user_id))
+        normalized_uri = f"data:image/{mime_subtype};base64,{clean_b64}"
+        conn.execute('UPDATE users SET avatar_url = ? WHERE id = ?', (normalized_uri, user_id))
         conn.commit()
 
-    return jsonify({'success': True, 'message': 'Foto profil berhasil diperbarui.', 'avatar_url': avatar_url})
+    return jsonify({'success': True, 'message': 'Foto profil berhasil diperbarui.', 'avatar_url': normalized_uri})
 
 
 @app.route('/api/delete-account', methods=['POST'])
