@@ -1080,6 +1080,28 @@ def reject_premium_confirmation(confirmation_id):
         'confirmation': dict(updated_conf)
     }), 200
 
+@app.route('/api/admin/delete-user/<int:user_id>', methods=['DELETE'])
+@admin_required
+def admin_delete_user(user_id):
+    with get_db_connection() as conn:
+        user = conn.execute('SELECT id, full_name, username FROM users WHERE id = ?', (user_id,)).fetchone()
+        if not user:
+            return jsonify({'success': False, 'message': 'Akun pengguna tidak ditemukan.'}), 404
+
+        conn.execute('DELETE FROM transactions WHERE user_id = ?', (user_id,))
+        conn.execute('DELETE FROM premium_payment_confirmations WHERE user_id = ?', (user_id,))
+        conn.execute('DELETE FROM device_telemetry WHERE user_id = ?', (user_id,))
+        conn.execute('DELETE FROM users WHERE id = ?', (user_id,))
+        conn.commit()
+
+    if session.get('user_id') == user_id:
+        session.pop('user_id', None)
+
+    return jsonify({
+        'success': True,
+        'message': f"Akun {user['username']} ({user['full_name']}) berhasil dihapus."
+    })
+
 
 if __name__ == '__main__':
     app.run(debug=True)
