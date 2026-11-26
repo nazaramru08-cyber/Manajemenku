@@ -478,11 +478,13 @@
         function renderDashboardData(data) {
             const user = data.user || {};
             const transactions = Array.isArray(data.transactions) ? data.transactions : [];
-            const fullName = String(user.full_name || 'Pengguna');
+            const rawUsername = String(user.username || '').trim();
+            const fallbackFromEmail = String(user.email || user.full_name || '').split('@')[0].trim();
+            const displayName = rawUsername || fallbackFromEmail || 'Pengguna';
 
-            document.getElementById('userFullName').textContent = fullName;
-            document.getElementById('userAvatar').textContent = fullName.charAt(0).toUpperCase() || 'U';
-
+            document.getElementById('userFullName').textContent = displayName;
+            document.getElementById('userAvatar').textContent = displayName.charAt(0).toUpperCase() || 'U';
+            
             const upgradeContainer = document.getElementById('sidebarUpgradeContainer');
             const headerUpgradeContainer = document.getElementById('headerUpgradeContainer');
             const headerBadge = document.getElementById('headerPremiumBadge');
