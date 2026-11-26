@@ -2,12 +2,14 @@ from flask import Flask, render_template, request, jsonify, session, send_file, 
 import sqlite3
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import base64
 import io
 import os
 import re
 import secrets
 import time
 import smtplib
+import uuid
 from datetime import datetime, timezone
 from functools import wraps
 from email.mime.text import MIMEText
@@ -122,6 +124,7 @@ with get_db_connection() as conn:
                 full_name TEXT NOT NULL,
                 username TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL,
+                avatar_url TEXT,
                 initial_balance DOUBLE PRECISION DEFAULT 0,
                 savings_goal DOUBLE PRECISION DEFAULT 0,
                 is_setup_completed INTEGER DEFAULT 0,
@@ -173,6 +176,7 @@ with get_db_connection() as conn:
                 verified_at TEXT
             )
         ''')
+        conn.execute('ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT')
     else:
         conn.execute('''
             CREATE TABLE IF NOT EXISTS users (
@@ -180,6 +184,7 @@ with get_db_connection() as conn:
                 full_name TEXT NOT NULL,
                 username TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL,
+                avatar_url TEXT,
                 initial_balance REAL DEFAULT 0,
                 savings_goal REAL DEFAULT 0,
                 is_setup_completed INTEGER DEFAULT 0,
@@ -233,6 +238,9 @@ with get_db_connection() as conn:
                 FOREIGN KEY (user_id) REFERENCES users (id)
             )
         ''')
+        user_cols = [r[1] for r in conn.execute("PRAGMA table_info(users)").fetchall()]
+        if 'avatar_url' not in user_cols:
+            conn.execute("ALTER TABLE users ADD COLUMN avatar_url TEXT")
     conn.commit()
 
 
@@ -265,6 +273,121 @@ def home():
         return render_template('login.html')
 
     return render_template('index.html')
+
+
+@app.route('/pengaturan-akun')
+def pengaturan_akun_page():
+    if 'user_id' not in session:
+        return render_template('login.html')
+    return render_template('pengaturan_akun.html')
+
+
+@app.route('/api/update-profile', methods=['POST'])
+def api_update_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'message': 'Sesi tidak ditemukan. Silakan login kembali.'}), 401
+
+    payload = request.get_json(silent=True) or {}
+    username = str(payload.get('username', '')).strip()
+    email = str(payload.get('email', '')).strip().lower()
+
+    if len(username) < 3 or len(username) > 40:
+        return jsonify({'success': False, 'message': 'Username minimal 3 dan maksimal 40 karakter.'}), 400
+
+    if not is_valid_gmail(email):
+        return jsonify({'success': False, 'message': 'Gunakan alamat Gmail valid berakhiran @gmail.com.'}), 400
+
+    with get_db_connection() as conn:
+        duplicate = conn.execute(
+            'SELECT id FROM users WHERE (LOWER(username) = LOWER(?) OR LOWER(full_name) = LOWER(?)) AND id != ?',
+            (username, email, user_id)
+        ).fetchone()
+        if duplicate:
+            return jsonify({'success': False, 'message': 'Username atau alamat Gmail sudah digunakan akun lain.'}), 409
+
+        conn.execute(
+            'UPDATE users SET username = ?, full_name = ? WHERE id = ?',
+            (username, email, user_id)
+        )
+        conn.commit()
+
+    return jsonify({'success': True, 'message': 'Profil akun berhasil diperbarui.'})
+
+
+@app.route('/api/update-avatar', methods=['POST'])
+def api_update_avatar():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'message': 'Sesi tidak ditemukan. Silakan login kembali.'}), 401
+
+    payload = request.get_json(silent=True) or {}
+    remove_avatar = bool(payload.get('remove_avatar', False))
+    avatar_base64 = payload.get('avatar_base64')
+
+    with get_db_connection() as conn:
+        if remove_avatar or not avatar_base64:
+            conn.execute('UPDATE users SET avatar_url = NULL WHERE id = ?', (user_id,))
+            conn.commit()
+            return jsonify({'success': True, 'message': 'Foto profil dikembalikan ke avatar inisial.'})
+
+        match = re.match(r'^data:image/(png|jpeg|jpg|webp);base64,(.+)$', str(avatar_base64))
+        if not match:
+            return jsonify({'success': False, 'message': 'Format gambar tidak didukung (gunakan PNG, JPG, atau WEBP).'}), 400
+
+        ext = 'jpg' if match.group(1) == 'jpeg' else match.group(1)
+        try:
+            raw_bytes = base64.b64decode(match.group(2), validate=True)
+        except Exception:
+            return jsonify({'success': False, 'message': 'Data gambar tidak valid.'}), 400
+
+        if len(raw_bytes) > 2 * 1024 * 1024:
+            return jsonify({'success': False, 'message': 'Ukuran gambar melebihi batas maksimal 2 MB.'}), 400
+
+        upload_dir = os.path.join(app.root_path, 'static', 'avatars')
+        os.makedirs(upload_dir, exist_ok=True)
+        filename = f"user_{user_id}_{uuid.uuid4().hex[:8]}.{ext}"
+        filepath = os.path.join(upload_dir, filename)
+
+        with open(filepath, 'wb') as f:
+            f.write(raw_bytes)
+
+        avatar_url = url_for('static', filename=f'avatars/{filename}')
+        conn.execute('UPDATE users SET avatar_url = ? WHERE id = ?', (avatar_url, user_id))
+        conn.commit()
+
+    return jsonify({'success': True, 'message': 'Foto profil berhasil diperbarui.', 'avatar_url': avatar_url})
+
+
+@app.route('/api/delete-account', methods=['POST'])
+def api_delete_account():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'message': 'Sesi tidak ditemukan. Silakan login kembali.'}), 401
+
+    payload = request.get_json(silent=True) or {}
+    confirmation = str(payload.get('confirmation', '')).strip()
+    password = str(payload.get('password', ''))
+
+    if confirmation != 'HAPUS AKUN':
+        return jsonify({'success': False, 'message': 'Ketik tepat "HAPUS AKUN" untuk mengonfirmasi.'}), 400
+
+    with get_db_connection() as conn:
+        user = conn.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+        if not user:
+            return jsonify({'success': False, 'message': 'Akun tidak ditemukan.'}), 404
+
+        if user['password'] != password:
+            return jsonify({'success': False, 'message': 'Password salah. Penghapusan akun dibatalkan.'}), 403
+
+        conn.execute('DELETE FROM transactions WHERE user_id = ?', (user_id,))
+        conn.execute('DELETE FROM premium_payment_confirmations WHERE user_id = ?', (user_id,))
+        conn.execute('DELETE FROM device_telemetry WHERE user_id = ?', (user_id,))
+        conn.execute('DELETE FROM users WHERE id = ?', (user_id,))
+        conn.commit()
+
+    session.pop('user_id', None)
+    return jsonify({'success': True, 'message': 'Akun dan seluruh data terkait telah dihapus permanen.'})
 
 
 @app.route('/forgot-password')
@@ -545,6 +668,7 @@ def get_user_data():
 
     user_dict = dict(user)
     user_dict.pop('password', None)
+    user_dict['email'] = user_dict.get('full_name', '')
 
     return jsonify({
         'user': user_dict,
@@ -893,6 +1017,7 @@ def hutang_piutang_page():
 @app.route("/tentang-kami")
 def tentang_kami():
     return render_template("tentang_kami.html", is_vip=session.get("is_vip", False))
+
 
 @app.route('/admin/premium-confirmations')
 @admin_required
