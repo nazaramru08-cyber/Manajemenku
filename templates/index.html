@@ -1,24 +1,9 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-72QBZPW7E6"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-72QBZPW7E6');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemenku - Smart Finance App</title>
-    <script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "yt1g68dq43");
-    </script>
+    <title>Pengaturan Akun - Manajemenku</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -43,8 +28,8 @@
             border-radius: 1.25rem;
         }
         .glass-input {
-            background: rgba(31, 41, 55, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(31, 41, 55, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             color: #ffffff;
         }
         .glass-input::placeholder {
@@ -55,41 +40,13 @@
             transition: 0.3s;
         }
         .gradient-btn:hover {
-            opacity: 0.9;
+            opacity: 0.92;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="min-h-screen pb-12">
 
-    <!-- Setup Screen (Untuk User Baru yang Belum Inisialisasi Saldo) -->
-    <div id="setupScreen" class="min-h-screen flex items-center justify-center p-4 hidden">
-        <div class="glass-card p-8 w-full max-w-lg border border-gray-800 shadow-2xl space-y-6">
-            <div class="text-center space-y-2">
-                <div class="w-12 h-12 mx-auto rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xl border border-indigo-500/20">
-                    <i class="fa-solid fa-sliders"></i>
-                </div>
-                <h1 class="text-2xl font-bold text-white">Inisialisasi Keuangan Awal</h1>
-                <p class="text-xs text-gray-400">Halo <b id="setupNameText"></b>, atur kondisi keuangan awal kamu saat ini.</p>
-            </div>
-
-            <form onsubmit="handleSetup(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Saldo Kas/Bank Saat Ini (Rp)</label>
-                    <input type="number" id="setupBalance" min="0" required placeholder="Contoh: 5000000 atau boleh nol untuk dari awal" class="w-full glass-input p-3 rounded-xl text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Target Tabungan (Rp)</label>
-                    <input type="number" id="setupGoal" min="0" required placeholder="Contoh: 20000000" class="w-full glass-input p-3 rounded-xl text-sm">
-                </div>
-                <button type="submit" class="w-full gradient-btn py-3 rounded-xl font-bold text-white text-sm">Mulai Gunakan Aplikasi</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Dashboard Screen -->
-    <div id="dashboardScreen" class="flex min-h-screen relative overflow-x-hidden">
+    <div class="flex min-h-screen relative overflow-x-hidden">
         <!-- Overlay Gelap saat Sidebar Terbuka -->
         <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
@@ -98,18 +55,18 @@
             <div class="p-5 border-b border-gray-800 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <a href="/" class="w-10 h-10 rounded-xl overflow-hidden shadow-lg border border-indigo-500/30 flex items-center justify-center bg-gray-900 hover:scale-105 transition">
-                        <img src="{{ url_for('static', filename='Manajemenku.png') }}" alt="Logo Ayam" class="w-full h-full object-cover">
+                        <img src="{{ url_for('static', filename='Manajemenku.png') }}" alt="Logo Manajemenku" class="w-full h-full object-cover">
                     </a>
                     <span class="font-extrabold text-base tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">MANAJEMENKU</span>
                 </div>
-                <!-- Tombol Tutup Sidebar -->
-                <button type="button" onclick="toggleSidebar()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button type="button" onclick="toggleSidebar()" class="text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
 
-            <!-- DAFTAR MENU SIDEBAR -->
             <div class="p-4 space-y-1 flex-1 text-sm font-medium">
                 <p class="text-[10px] uppercase text-gray-500 font-bold px-3 mb-2">Menu Utama</p>
-                <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-indigo-400 bg-indigo-500/10 transition">
+                <a href="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition">
                     <i class="fa-solid fa-chart-pie w-5"></i> Ringkasan Portfolio
                 </a>
                 <a href="/split-bill" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition">
@@ -118,19 +75,14 @@
                 <a href="/hutang-piutang" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition">
                     <i class="fa-solid fa-handshake-angle w-5"></i> Hutang Piutang
                 </a>
+                <a href="/pengaturan-akun" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-indigo-400 bg-indigo-500/10 transition">
+                    <i class="fa-solid fa-user-gear w-5"></i> Pengaturan Akun
+                </a>
                 <a href="/tentang-kami" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition">
                     <i class="fa-solid fa-circle-info w-5"></i> Tentang Kami
                 </a>
-
-                <div class="pt-4">
-                    <p class="text-[10px] uppercase text-gray-500 font-bold px-3 mb-2">Keanggotaan</p>
-                    <div id="sidebarUpgradeContainer">
-                        <!-- Tombol Upgrade atau Badge Premium akan dimuat otomatis lewat JS -->
-                    </div>
-                </div>
             </div>
 
-            <!-- TOMBOL KELUAR DI BAWAH SIDEBAR -->
             <div class="p-4 border-t border-gray-800">
                 <button type="button" onclick="handleLogout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-rose-400 hover:bg-rose-500/10 transition text-sm font-semibold">
                     <i class="fa-solid fa-right-from-bracket w-5"></i> Keluar
@@ -138,277 +90,148 @@
             </div>
         </aside>
 
-        <!-- KONTEN UTAMA DI SEBELAH KANAN -->
+        <!-- KONTEN UTAMA -->
         <div id="mainContent" class="flex-1 flex flex-col w-full transition-all duration-300">
             <header class="border-b border-gray-800 bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-40 h-16 flex items-center px-4 sm:px-8 justify-between">
                 <div class="flex items-center gap-4">
-                    <!-- Tombol Garis Tiga (Hamburger Menu) -->
                     <button type="button" onclick="toggleSidebar()" class="w-10 h-10 rounded-xl border border-gray-700 bg-gray-800/80 hover:bg-indigo-600/20 text-gray-300 hover:text-indigo-400 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-md">
                         <i class="fa-solid fa-bars text-lg"></i>
                     </button>
-                    <span class="font-extrabold text-lg text-white hidden sm:inline">Portal Keuangan</span>
+                    <span class="font-extrabold text-lg text-white hidden sm:inline">Pengaturan Akun</span>
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <div id="headerPremiumBadge"></div>
-                    <div class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xs" id="userAvatar"></div>
-                    <span class="text-sm font-semibold text-gray-200 truncate max-w-[180px] sm:max-w-xs" id="userFullName"></span>
+                    <div id="headerAvatarBox" class="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xs overflow-hidden">
+                        <span id="headerAvatarInitial">U</span>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-200 truncate max-w-[180px] sm:max-w-xs" id="headerDisplayName">Pengguna</span>
                 </div>
             </header>
 
-            <div class="p-4 sm:p-8 pt-8 space-y-8 w-full max-w-7xl mx-auto">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div>
-                        <h1 class="text-2xl font-extrabold text-white">Ringkasan Portofolio</h1>
-                        <p class="text-xs text-gray-400 mt-0.5">Kelola arus kas secara terstruktur dan otomatis.</p>
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
-                        <!-- Tombol Download Laporan PDF (VIP Only) -->
-                        <div id="pdfExportContainer" class="hidden">
-                            <button type="button" onclick="downloadPdfReport()" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:opacity-90 px-5 py-3 rounded-xl font-semibold text-white flex items-center gap-2 text-sm transition shadow-lg">
-                                <i class="fa-solid fa-file-pdf"></i> Download Laporan PDF (VIP)
-                            </button>
-                        </div>
-
-                        <!-- Tombol Upgrade Premium + Penjelasan Manfaat di Samping Catat Transaksi -->
-                        <div id="headerUpgradeContainer" class="flex flex-col sm:flex-row sm:items-center gap-2.5 bg-gray-900/80 border border-amber-500/25 px-3.5 py-2.5 rounded-2xl">
-                            <button type="button" onclick="openPremiumModal()" class="px-4 py-2.5 rounded-xl font-semibold text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 flex items-center gap-2 text-xs sm:text-sm transition shrink-0">
-                                <i class="fa-solid fa-crown"></i> Upgrade ke Premium
-                            </button>
-                            <p class="text-[11px] text-gray-300 leading-snug max-w-xs">
-                                Dengan akun <b class="text-amber-300">Premium</b>, kamu bisa <b class="text-white">mengunduh laporan keuangan dalam bentuk PDF</b> serta <b class="text-white">membantu pengembangan web</b> ini selanjutnya.
-                            </p>
-                        </div>
-
-                        <button type="button" onclick="openModal()" class="gradient-btn px-5 py-3 rounded-xl font-semibold text-white flex items-center gap-2 text-sm transition hover:scale-105 shadow-lg shrink-0">
-                            <i class="fa-solid fa-plus"></i> Catat Transaksi Baru
-                        </button>
-                    </div>
+            <main class="p-4 sm:p-8 pt-8 space-y-6 w-full max-w-4xl mx-auto">
+                <div>
+                    <h1 class="text-2xl font-extrabold text-white">Pengaturan Profil & Akun</h1>
+                    <p class="text-xs text-gray-400 mt-1">Perbarui username/nama, alamat Gmail, foto profil, atau kelola penghapusan akun.</p>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                    <div class="glass-card p-5">
-                        <p class="text-xs font-medium text-gray-400 uppercase">Total Saldo Aktif</p>
-                        <h3 class="text-2xl font-bold text-white mt-1" id="dashTotalBalance">Rp 0</h3>
-                        <p class="text-[11px] text-gray-500 mt-2">Saldo Awal + Net Transaksi</p>
-                    </div>
-                    <div class="glass-card p-5">
-                        <p class="text-xs font-medium text-gray-400 uppercase">Total Pemasukan</p>
-                        <h3 class="text-2xl font-bold text-emerald-400 mt-1" id="dashTotalIncome">Rp 0</h3>
-                        <p class="text-[11px] text-emerald-500 mt-2"><i class="fa-solid fa-arrow-down mr-1"></i>Akumulasi Masuk</p>
-                    </div>
-                    <div class="glass-card p-5">
-                        <p class="text-xs font-medium text-gray-400 uppercase">Total Pengeluaran</p>
-                        <h3 class="text-2xl font-bold text-rose-400 mt-1" id="dashTotalExpense">Rp 0</h3>
-                        <p class="text-[11px] text-rose-500 mt-2"><i class="fa-solid fa-arrow-up mr-1"></i>Akumulasi Keluar</p>
-                    </div>
-                    <div class="glass-card p-5">
-                        <p class="text-xs font-medium text-gray-400 uppercase">Pencapaian Target Tabungan</p>
-                        <h3 class="text-2xl font-bold text-purple-400 mt-1" id="dashSavingsPercent">0%</h3>
-                        <div class="w-full bg-gray-800 h-2 rounded-full mt-2 overflow-hidden">
-                            <div class="bg-gradient-to-r from-purple-500 to-indigo-500 h-full" id="dashProgressBar" style="width: 0%"></div>
+                <!-- Kartu 1: Foto Profil -->
+                <section class="glass-card p-6 space-y-5">
+                    <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+                        <div>
+                            <h2 class="text-base font-bold text-white">Foto Profil</h2>
+                            <p class="text-xs text-gray-400">Format JPG, PNG, atau WEBP (maksimal 2 MB).</p>
                         </div>
                     </div>
-                </div>
 
-                <div class="glass-card p-6">
-                    <h2 class="text-lg font-bold text-white mb-4">Riwayat Transaksi</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-gray-400">
-                            <thead class="text-xs uppercase bg-gray-900/60 text-gray-400 border-b border-gray-800">
-                                <tr>
-                                    <th class="py-3 px-4">Deskripsi Transaksi</th>
-                                    <th class="py-3 px-4">Kategori</th>
-                                    <th class="py-3 px-4">Tanggal</th>
-                                    <th class="py-3 px-4 text-right">Nominal</th>
-                                    <th class="py-3 px-4 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-800/50" id="txTableBody"></tbody>
-                        </table>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+                        <div class="w-20 h-20 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center overflow-hidden shrink-0">
+                            <img id="profilePreviewImg" src="" alt="Foto Profil" class="w-full h-full object-cover hidden">
+                            <span id="profileInitialFallback" class="text-2xl font-extrabold text-indigo-300">U</span>
+                        </div>
+
+                        <div class="space-y-3 flex-1 w-full">
+                            <div class="flex flex-wrap items-center gap-2.5">
+                                <label class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs font-semibold text-white cursor-pointer transition">
+                                    <i class="fa-solid fa-image mr-1.5"></i> Pilih Gambar
+                                    <input type="file" id="avatarFileInput" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="handleAvatarFileChange(event)">
+                                </label>
+                                <button type="button" id="btnSaveAvatar" onclick="saveAvatar()" class="px-4 py-2 rounded-xl gradient-btn text-xs font-bold text-white transition">
+                                    Simpan Foto Profil
+                                </button>
+                                <button type="button" onclick="resetAvatarToInitial()" class="px-3.5 py-2 rounded-xl bg-gray-800/70 hover:bg-gray-800 border border-gray-700/70 text-xs font-semibold text-gray-300 transition">
+                                    Pakai Inisial
+                                </button>
+                            </div>
+                            <p id="avatarStatusText" class="text-[11px] text-gray-400"></p>
+                        </div>
                     </div>
-                </div>
+                </section>
 
-                <div class="glass-card tilt-card p-6 rounded-2xl space-y-4 my-6" data-tilt data-tilt-max="5">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-lg border border-indigo-500/20">
-                                <i class="fa-solid fa-globe"></i>
+                <!-- Kartu 2: Ubah Username / Nama & Gmail -->
+                <section class="glass-card p-6 space-y-5">
+                    <div class="border-b border-gray-800 pb-4">
+                        <h2 class="text-base font-bold text-white">Informasi Akun</h2>
+                        <p class="text-xs text-gray-400">Ubah username atau nama tampilan serta alamat Gmail aktif kamu.</p>
+                    </div>
+
+                    <form onsubmit="handleUpdateProfile(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Username / Nama Tampilan</label>
+                                <input type="text" id="inputUsername" required minlength="3" maxlength="40" placeholder="Contoh: habib_tgal" class="w-full glass-input p-3 rounded-xl text-sm">
                             </div>
                             <div>
-                                <h3 class="text-white font-bold text-lg">Kalkulator Konversi Valuta Asing</h3>
-                                <p class="text-xs text-gray-400">Estimasi nilai Rupiah (IDR) ke mata uang mancanegara.</p>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Alamat Gmail</label>
+                                <input type="email" id="inputEmail" required pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$" placeholder="namaakun@gmail.com" class="w-full glass-input p-3 rounded-xl text-sm">
+                                <p class="text-[11px] text-gray-500 mt-1">Wajib menggunakan alamat @gmail.com</p>
                             </div>
                         </div>
-                        <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full font-semibold border border-indigo-500/30">Live Exchange</span>
-                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">Nominal Rupiah (IDR)</label>
-                            <input type="number" id="convertAmount" placeholder="Contoh: 1000000" class="w-full glass-input p-3 rounded-xl text-sm" oninput="calculateCurrency()">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">Konversi Ke Mata Uang</label>
-                            <select id="convertTarget" onchange="calculateCurrency()" class="w-full glass-input p-3 rounded-xl text-sm">
-                                <option value="USD">🇺🇸 Dolar Amerika (USD)</option>
-                                <option value="EUR">🇪🇺 Euro (EUR)</option>
-                                <option value="JPY">🇯🇵 Yen Jepang (JPY)</option>
-                                <option value="SAR">🇸🇦 Riyal Arab (SAR)</option>
-                                <option value="MYR">🇲🇾 Ringgit Malaysia (MYR)</option>
-                                <option value="SGD">🇸🇬 Dolar Singapura (SGD)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">Hasil Konversi</label>
-                            <div class="glass-input p-3 rounded-xl text-sm font-bold text-emerald-400 flex items-center justify-between h-[46px]">
-                                <span id="convertResult">0</span>
-                                <span id="targetSymbol" class="text-xs text-gray-400">USD</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Kartu Grafik Keuangan -->
-                <div class="glass-card tilt-card p-6 rounded-2xl space-y-4 my-6" data-tilt data-tilt-max="5">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <h3 class="text-white font-bold text-lg">Ringkasan Keuangan Bulanan</h3>
-
-                        <!-- Tombol Pilihan Jenis Diagram -->
-                        <div class="inline-flex rounded-xl bg-gray-900/90 p-1 border border-gray-700/70 self-start sm:self-auto">
-                            <button type="button" id="btnChartLine" onclick="switchChartType('line')"
-                                class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition">
-                                <i class="fa-solid fa-chart-line mr-1"></i> Garis
-                            </button>
-                            <button type="button" id="btnChartBar" onclick="switchChartType('bar')"
-                                class="px-3 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">
-                                <i class="fa-solid fa-chart-column mr-1"></i> Batang
+                        <div class="pt-1 flex items-center justify-end">
+                            <button type="submit" id="btnSaveProfile" class="px-5 py-2.5 rounded-xl gradient-btn text-xs sm:text-sm font-bold text-white shadow-lg transition">
+                                <i class="fa-solid fa-floppy-disk mr-1.5"></i> Simpan Perubahan Profil
                             </button>
                         </div>
+                    </form>
+                </section>
+
+                <!-- Kartu 3: Zona Bahaya - Hapus Akun -->
+                <section class="glass-card p-6 border border-rose-500/30 space-y-4">
+                    <div class="border-b border-gray-800 pb-4">
+                        <h2 class="text-base font-bold text-rose-400"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i> Hapus Akun Permanen</h2>
+                        <p class="text-xs text-gray-400 mt-1">
+                            Menghapus akun akan menghapus profil, riwayat transaksi, dan data terkait secara permanen dan tidak bisa dibatalkan.
+                        </p>
                     </div>
 
-                    <div class="w-full h-64">
-                        <canvas id="financeChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                    <form onsubmit="handleDeleteAccount(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">
+                                Ketik <span class="text-rose-400 font-bold">HAPUS AKUN</span> untuk konfirmasi
+                            </label>
+                            <input type="text" id="deleteConfirmPhrase" required placeholder="Ketik: HAPUS AKUN" class="w-full glass-input p-3 rounded-xl text-sm">
+                        </div>
 
-    <!-- Modal Transaksi -->
-    <div id="modalAdd" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="glass-card p-6 w-full max-w-md border border-gray-700 shadow-2xl relative">
-            <div class="flex justify-between items-center mb-5">
-                <h3 class="text-lg font-bold text-white">Catat Transaksi</h3>
-                <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Konfirmasi Password Akun</label>
+                            <input type="password" id="deleteConfirmPassword" required placeholder="Masukkan password kamu saat ini" class="w-full glass-input p-3 rounded-xl text-sm">
+                        </div>
 
-            <form onsubmit="handleAddTransaction(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-1">Judul / Deskripsi</label>
-                    <input type="text" id="txTitle" required placeholder="Contoh: Belanja Bulanan" class="w-full glass-input p-2.5 rounded-xl text-sm">
-                </div>
+                        <label class="flex items-start gap-2.5 text-xs text-gray-300 cursor-pointer">
+                            <input type="checkbox" id="deleteAckCheckbox" required class="mt-0.5 rounded border-gray-600 bg-gray-800 text-rose-500 focus:ring-rose-500">
+                            <span>Saya mengerti bahwa seluruh data akun saya akan dihapus permanen dan tidak dapat dipulihkan.</span>
+                        </label>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-300 mb-1">Tipe</label>
-                        <select id="txType" onchange="updateCategories()" class="w-full glass-input p-2.5 rounded-xl text-sm">
-                            <option value="expense">Pengeluaran</option>
-                            <option value="income">Pemasukan</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-300 mb-1">Kategori</label>
-                        <select id="txCategory" onchange="checkCustomCategory()" class="w-full glass-input p-2.5 rounded-xl text-sm"></select>
-                    </div>
-                </div>
-
-                <div id="customCategoryContainer" class="hidden">
-                    <label class="block text-xs font-medium text-gray-300 mb-1">Ketik Kategori Lainnya</label>
-                    <input type="text" id="txCustomCategory" placeholder="Ketik kategori bebas..." class="w-full glass-input p-2.5 rounded-xl text-sm">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-1">Jumlah Nominal (Rp)</label>
-                    <input type="number" id="txAmount" min="1" required placeholder="100000" class="w-full glass-input p-2.5 rounded-xl text-sm">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-1">Tanggal Transaksi</label>
-                    <input type="date" id="txDate" required class="w-full glass-input p-2.5 rounded-xl text-sm">
-                </div>
-
-                <div class="pt-2">
-                    <button type="submit" class="w-full gradient-btn py-3 rounded-xl font-bold text-white text-sm">Simpan Transaksi</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Pembayaran DANA QR / Upgrade Premium -->
-    <div id="modalPremium" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="glass-card p-6 w-full max-w-sm border border-indigo-500/30 shadow-2xl relative text-center space-y-4">
-            <div class="flex justify-between items-center">
-                <h3 class="text-base font-bold text-white">Upgrade Akun Premium</h3>
-                <button type="button" onclick="closePremiumModal()" class="text-gray-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <p class="text-xs text-gray-400">Scan QRIS di bawah untuk pembayaran sebesar <b class="text-indigo-400">Rp 25.000</b></p>
-
-            <!-- Gambar QR Code DANA Asli -->
-            <div class="bg-white p-4 rounded-2xl w-48 h-48 mx-auto flex items-center justify-center shadow-inner border border-gray-300">
-                <img src="{{ url_for('static', filename='qris.jpeg') }}" alt="QR Code DANA" class="w-full h-full object-contain">
-            </div>
-
-            <form onsubmit="submitPaymentConfirmation(event)" class="space-y-3 text-left pt-1">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Nama Pengirim</label>
-                    <input type="text" id="danaSenderName" required placeholder="Contoh: Makarov Burgandof" class="w-full glass-input p-2.5 rounded-xl text-xs">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-300 mb-1">Catatan / No. Referensi Transfer</label>
-                    <input type="text" id="danaPaymentNote" required placeholder="Contoh: REF-PAY-87654321, dan lain-lain" class="w-full glass-input p-2.5 rounded-xl text-xs">
-                </div>
-                <button type="submit" id="btnSubmitPaymentConfirm" class="w-full gradient-btn py-2.5 rounded-xl font-bold text-white text-xs shadow-lg">
-                    <i class="fa-solid fa-paper-plane mr-1"></i> Kirim Konfirmasi Pembayaran
-                </button>
-            </form>
-
-            <p id="paymentConfirmStatus" class="text-[11px] text-amber-300 hidden"></p>
-            <p class="text-[10px] text-gray-500">Pembayaran QRIS • PT Manajemenku</p>
-            <p class="text-[10px] text-gray-500">Jika Sudah Scan Tinggal Refresh Tab Web</p>
+                        <div class="pt-1">
+                            <button type="submit" id="btnDeleteAccount" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold transition shadow-lg">
+                                <i class="fa-solid fa-trash mr-1.5"></i> Hapus Akun Saya Sekarang
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </main>
         </div>
     </div>
 
     <script>
-        const expenseCategories = ["Makanan & Minuman", "Sewa & tempat tinggal", "Transportasi & Bensin", "Belanja Bulanan", "Tagihan & Listrik", "Kesehatan & Obat", "Pendidikan & Kuliah", "Hiburan & Rekreasi", "Lainnya"];
-        const incomeCategories = ["Gaji Utama", "Bonus & Tunjangan", "Project Freelance", "Hasil Investasi", "Hadiah / Hibah", "Lainnya"];
+        let selectedAvatarBase64 = null;
+        let removeAvatarFlag = false;
 
-        function escapeHtml(str) {
-            return String(str ?? '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        function showToast(message) {
+        function showToast(message, isError = false) {
             const toast = document.createElement('div');
-            toast.className = 'fixed top-20 right-4 z-50 bg-slate-900 border border-indigo-500/40 text-white px-4 py-3 rounded-xl shadow-xl text-xs font-semibold transition-opacity duration-300';
+            toast.className = `fixed top-20 right-4 z-50 bg-slate-900 border ${isError ? 'border-rose-500/50 text-rose-200' : 'border-indigo-500/40 text-white'} px-4 py-3 rounded-xl shadow-xl text-xs font-semibold transition-opacity duration-300`;
             toast.textContent = message;
             document.body.appendChild(toast);
             setTimeout(() => {
                 toast.classList.add('opacity-0');
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            }, 3200);
         }
 
         function toggleSidebar() {
             const sidebar = document.getElementById('appSidebar');
             const overlay = document.getElementById('sidebarOverlay');
             const mainContent = document.getElementById('mainContent');
-
             const isOpen = !sidebar.classList.contains('-translate-x-full');
 
             if (isOpen) {
@@ -417,24 +240,39 @@
                     overlay.classList.add('opacity-0', 'pointer-events-none');
                     overlay.classList.remove('opacity-100', 'pointer-events-auto');
                 }
-                if (window.innerWidth >= 768) {
-                    mainContent.classList.remove('md:pl-64');
-                }
+                if (window.innerWidth >= 768) mainContent.classList.remove('md:pl-64');
             } else {
                 sidebar.classList.remove('-translate-x-full');
                 if (overlay) {
                     overlay.classList.remove('opacity-0', 'pointer-events-none');
                     overlay.classList.add('opacity-100', 'pointer-events-auto');
                 }
-                if (window.innerWidth >= 768) {
-                    mainContent.classList.add('md:pl-64');
-                }
+                if (window.innerWidth >= 768) mainContent.classList.add('md:pl-64');
             }
         }
 
-        function formatRupiah(num) { return 'Rp ' + Number(num).toLocaleString('id-ID'); }
+        function applyAvatarVisual(avatarUrl, displayName) {
+            const initial = (String(displayName || 'U').trim().charAt(0) || 'U').toUpperCase();
+            const previewImg = document.getElementById('profilePreviewImg');
+            const fallbackSpan = document.getElementById('profileInitialFallback');
+            const headerBox = document.getElementById('headerAvatarBox');
 
-        async function checkUserState() {
+            fallbackSpan.textContent = initial;
+
+            if (avatarUrl) {
+                previewImg.src = avatarUrl;
+                previewImg.classList.remove('hidden');
+                fallbackSpan.classList.add('hidden');
+                headerBox.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="w-full h-full object-cover">`;
+            } else {
+                previewImg.src = '';
+                previewImg.classList.add('hidden');
+                fallbackSpan.classList.remove('hidden');
+                headerBox.innerHTML = `<span id="headerAvatarInitial">${initial}</span>`;
+            }
+        }
+
+        async function loadAccountSettings() {
             try {
                 const res = await fetch('/api/user-data', { credentials: 'same-origin' });
                 if (!res.ok) {
@@ -447,283 +285,182 @@
                     window.location.href = '/';
                     return;
                 }
-                if (!user.is_setup_completed) {
-                    document.getElementById('setupNameText').textContent = user.full_name || '';
-                    document.getElementById('setupScreen').classList.remove('hidden');
-                    document.getElementById('dashboardScreen').classList.add('hidden');
-                } else {
-                    document.getElementById('setupScreen').classList.add('hidden');
-                    document.getElementById('dashboardScreen').classList.remove('hidden');
-                    renderDashboardData(data);
-                }
+
+                const usernameVal = String(user.username || user.full_name || '').trim();
+                const emailVal = String(user.email || '').trim();
+                const avatarUrl = user.avatar_url || user.profile_image || '';
+
+                document.getElementById('inputUsername').value = usernameVal;
+                document.getElementById('inputEmail').value = emailVal;
+                document.getElementById('headerDisplayName').textContent = usernameVal || 'Pengguna';
+
+                selectedAvatarBase64 = null;
+                removeAvatarFlag = false;
+                applyAvatarVisual(avatarUrl, usernameVal);
             } catch (err) {
-                console.error('Gagal memuat data pengguna:', err);
+                console.error('Gagal memuat data akun:', err);
+                showToast('Gagal memuat informasi akun.', true);
             }
         }
 
-        async function handleSetup(e) {
-            e.preventDefault();
-            const balance = Number(document.getElementById('setupBalance').value);
-            const goal = Number(document.getElementById('setupGoal').value);
+        function handleAvatarFileChange(event) {
+            const file = event.target.files && event.target.files[0];
+            const statusText = document.getElementById('avatarStatusText');
+            if (!file) return;
 
-            const res = await fetch('/api/setup', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ initial_balance: balance, savings_goal: goal })
-            });
-            if(res.ok) { checkUserState(); }
-        }
-
-        function renderDashboardData(data) {
-            const user = data.user || {};
-            const transactions = Array.isArray(data.transactions) ? data.transactions : [];
-            const rawUsername = String(user.username || '').trim();
-            const fallbackFromEmail = String(user.email || user.full_name || '').split('@')[0].trim();
-            const displayName = rawUsername || fallbackFromEmail || 'Pengguna';
-
-            document.getElementById('userFullName').textContent = displayName;
-            document.getElementById('userAvatar').textContent = displayName.charAt(0).toUpperCase() || 'U';
-            
-            const upgradeContainer = document.getElementById('sidebarUpgradeContainer');
-            const headerUpgradeContainer = document.getElementById('headerUpgradeContainer');
-            const headerBadge = document.getElementById('headerPremiumBadge');
-            const pdfContainer = document.getElementById('pdfExportContainer');
-
-            if (user.is_premium) {
-                upgradeContainer.innerHTML = `
-                    <div class="px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center gap-2 text-xs font-bold">
-                        <i class="fa-solid fa-crown"></i> Akun VIP Premium
-                    </div>
-                `;
-                headerBadge.innerHTML = `
-                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                        <i class="fa-solid fa-crown"></i> VIP
-                    </span>
-                `;
-                if (headerUpgradeContainer) headerUpgradeContainer.classList.add('hidden');
-                if (pdfContainer) pdfContainer.classList.remove('hidden');
-            } else {
-                upgradeContainer.innerHTML = ``;
-                headerBadge.innerHTML = ``;
-                if (headerUpgradeContainer) headerUpgradeContainer.classList.remove('hidden');
-                if (pdfContainer) pdfContainer.classList.add('hidden');
-            }
-
-            let totalIncome = 0;
-            let totalExpense = 0;
-
-            transactions.forEach(tx => {
-                const amount = Number(tx.amount) || 0;
-                if (tx.type === 'income') totalIncome += amount;
-                else totalExpense += amount;
-            });
-
-            const initialBalance = Number(user.initial_balance) || 0;
-            const savingsGoal = Number(user.savings_goal) || 0;
-            const totalBalance = initialBalance + totalIncome - totalExpense;
-            const percent = savingsGoal > 0 ? (totalBalance / savingsGoal) * 100 : 0;
-
-            document.getElementById('dashTotalBalance').textContent = formatRupiah(totalBalance);
-            document.getElementById('dashTotalIncome').textContent = formatRupiah(totalIncome);
-            document.getElementById('dashTotalExpense').textContent = formatRupiah(totalExpense);
-            document.getElementById('dashSavingsPercent').textContent = percent.toFixed(1) + '%';
-            document.getElementById('dashProgressBar').style.width = Math.min(Math.max(percent, 0), 100) + '%';
-
-            const tbody = document.getElementById('txTableBody');
-            tbody.innerHTML = '';
-
-            if (transactions.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-gray-500">Belum ada transaksi tercatat.</td></tr>`;
-            } else {
-                transactions.forEach(tx => {
-                    const isIncome = tx.type === 'income';
-                    const safeId = Number(tx.id);
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-gray-800/30">
-                            <td class="py-3.5 px-4 font-semibold text-white flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs ${isIncome ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}">
-                                    <i class="fa-solid ${isIncome ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
-                                </div>
-                                ${escapeHtml(tx.title)}
-                            </td>
-                            <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300 border border-gray-700">${escapeHtml(tx.category)}</span></td>
-                            <td class="py-3.5 px-4 text-xs">${escapeHtml(tx.date)}</td>
-                            <td class="py-3.5 px-4 text-right font-bold ${isIncome ? 'text-emerald-400' : 'text-rose-400'}">
-                                ${isIncome ? '+' : '-'} ${formatRupiah(Number(tx.amount) || 0)}
-                            </td>
-                            <td class="py-3.5 px-4 text-center">
-                                <button type="button" onclick="deleteTransaction(${safeId})" class="text-gray-500 hover:text-rose-400" aria-label="Hapus transaksi"><i class="fa-solid fa-trash-can"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-
-            updateChart();
-        }
-
-        function downloadPdfReport() {
-            window.location.href = '/api/export-pdf';
-        }
-
-        async function loadLatestPaymentStatus() {
-            const statusEl = document.getElementById('paymentConfirmStatus');
-            if (!statusEl) return;
-
-            try {
-                const res = await fetch('/api/premium-payment-status', { credentials: 'same-origin' });
-                if (!res.ok) return;
-                const data = await res.json();
-                const conf = data && data.confirmation;
-
-                if (conf && conf.status === 'pending') {
-                    statusEl.textContent = `Status terakhir: Menunggu verifikasi (${conf.sender_name} • ${conf.payment_note}).`;
-                    statusEl.classList.remove('hidden');
-                } else if (conf && conf.status === 'rejected') {
-                    statusEl.textContent = 'Pengajuan sebelumnya ditolak. Silakan kirim ulang konfirmasi pembayaran yang valid.';
-                    statusEl.classList.remove('hidden');
-                } else {
-                    statusEl.classList.add('hidden');
-                }
-            } catch (err) {
-                console.error('Gagal memuat status konfirmasi:', err);
-            }
-        }
-
-        function openPremiumModal() {
-            document.getElementById('modalPremium').classList.remove('hidden');
-            loadLatestPaymentStatus();
-        }
-
-        function closePremiumModal() {
-            document.getElementById('modalPremium').classList.add('hidden');
-        }
-
-        async function submitPaymentConfirmation(e) {
-            e.preventDefault();
-            const senderName = document.getElementById('danaSenderName').value.trim();
-            const paymentNote = document.getElementById('danaPaymentNote').value.trim();
-            const statusEl = document.getElementById('paymentConfirmStatus');
-            const submitBtn = document.getElementById('btnSubmitPaymentConfirm');
-
-            if (!senderName || !paymentNote) {
-                showToast('Lengkapi nama pengirim dan catatan pembayaran terlebih dahulu.');
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                statusText.textContent = 'Format file harus PNG, JPG, atau WEBP.';
+                event.target.value = '';
                 return;
             }
 
-            submitBtn.disabled = true;
-            submitBtn.classList.add('opacity-60');
+            const maxBytes = 2 * 1024 * 1024;
+            if (file.size > maxBytes) {
+                statusText.textContent = 'Ukuran gambar melebihi batas maksimal 2 MB.';
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedAvatarBase64 = e.target.result;
+                removeAvatarFlag = false;
+                const currentName = document.getElementById('inputUsername').value || 'U';
+                applyAvatarVisual(selectedAvatarBase64, currentName);
+                statusText.textContent = `Pratinjau dipilih: ${file.name}. Klik "Simpan Foto Profil" untuk menerapkan.`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetAvatarToInitial() {
+            selectedAvatarBase64 = null;
+            removeAvatarFlag = true;
+            document.getElementById('avatarFileInput').value = '';
+            const currentName = document.getElementById('inputUsername').value || 'U';
+            applyAvatarVisual('', currentName);
+            document.getElementById('avatarStatusText').textContent = 'Akan dikembalikan ke avatar inisial saat tombol Simpan Foto Profil ditekan.';
+        }
+
+        async function saveAvatar() {
+            const statusText = document.getElementById('avatarStatusText');
+            if (!selectedAvatarBase64 && !removeAvatarFlag) {
+                statusText.textContent = 'Pilih gambar baru atau klik "Pakai Inisial" terlebih dahulu.';
+                return;
+            }
+
+            const btn = document.getElementById('btnSaveAvatar');
+            btn.disabled = true;
+            btn.classList.add('opacity-60');
 
             try {
-                const res = await fetch('/api/confirm-premium-payment', {
+                const res = await fetch('/api/update-avatar', {
                     method: 'POST',
                     credentials: 'same-origin',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        sender_name: senderName,
-                        payment_note: paymentNote,
-                        amount: 25000,
-                        method: 'DANA_QR'
+                        avatar_base64: removeAvatarFlag ? null : selectedAvatarBase64,
+                        remove_avatar: removeAvatarFlag
                     })
                 });
-
                 const data = await res.json().catch(() => ({}));
-
                 if (res.ok && data.success) {
-                    statusEl.textContent = data.message || 'Konfirmasi pembayaran terkirim. Menunggu verifikasi.';
-                    statusEl.classList.remove('hidden');
-                    showToast(data.message || 'Konfirmasi pembayaran berhasil dikirim.');
-                    e.target.reset();
-                    checkUserState();
+                    showToast(data.message || 'Foto profil berhasil diperbarui.');
+                    statusText.textContent = 'Foto profil tersimpan.';
+                    await loadAccountSettings();
                 } else {
-                    showToast(data.message || 'Gagal mengirim konfirmasi pembayaran.');
+                    showToast(data.message || 'Gagal memperbarui foto profil.', true);
                 }
             } catch (err) {
-                console.error('Error konfirmasi pembayaran:', err);
-                showToast('Terjadi kesalahan jaringan saat mengirim konfirmasi.');
+                console.error('Error simpan foto profil:', err);
+                showToast('Terjadi kesalahan jaringan saat menyimpan foto profil.', true);
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('opacity-60');
+                btn.disabled = false;
+                btn.classList.remove('opacity-60');
             }
         }
 
-        function checkCustomCategory() {
-            const categorySelect = document.getElementById('txCategory');
-            const customContainer = document.getElementById('customCategoryContainer');
-            const customInput = document.getElementById('txCustomCategory');
-
-            if (categorySelect.value === 'Lainnya') {
-                customContainer.classList.remove('hidden');
-                customInput.required = true;
-            } else {
-                customContainer.classList.add('hidden');
-                customInput.required = false;
-                customInput.value = '';
-            }
-        }
-
-        function updateCategories() {
-            const type = document.getElementById('txType').value;
-            const categorySelect = document.getElementById('txCategory');
-            categorySelect.innerHTML = '';
-
-            const categories = type === 'income' ? incomeCategories : expenseCategories;
-            categories.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat;
-                categorySelect.appendChild(opt);
-            });
-
-            checkCustomCategory();
-        }
-
-        function openModal() {
-            document.getElementById('modalAdd').classList.remove('hidden');
-            document.getElementById('txDate').valueAsDate = new Date();
-            updateCategories();
-        }
-
-        function closeModal() {
-            document.getElementById('modalAdd').classList.add('hidden');
-        }
-
-        async function handleAddTransaction(e) {
+        async function handleUpdateProfile(e) {
             e.preventDefault();
-            const title = document.getElementById('txTitle').value.trim();
-            const type = document.getElementById('txType').value;
-            let category = document.getElementById('txCategory').value;
+            const username = document.getElementById('inputUsername').value.trim();
+            const email = document.getElementById('inputEmail').value.trim().toLowerCase();
 
-            if (category === 'Lainnya') {
-                const customCategory = document.getElementById('txCustomCategory').value.trim();
-                if (customCategory !== '') {
-                    category = customCategory;
-                }
+            if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email)) {
+                showToast('Gunakan alamat Gmail aktif berakhiran @gmail.com.', true);
+                return;
             }
 
-            const amount = Number(document.getElementById('txAmount').value);
-            const date = document.getElementById('txDate').value;
+            const btn = document.getElementById('btnSaveProfile');
+            btn.disabled = true;
+            btn.classList.add('opacity-60');
 
-            const res = await fetch('/api/add-transaction', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, type, category, amount, date })
-            });
-            if(res.ok) { closeModal(); checkUserState(); }
+            try {
+                const res = await fetch('/api/update-profile', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.success) {
+                    showToast(data.message || 'Profil akun berhasil diperbarui.');
+                    await loadAccountSettings();
+                } else {
+                    showToast(data.message || 'Gagal memperbarui profil akun.', true);
+                }
+            } catch (err) {
+                console.error('Error update profil:', err);
+                showToast('Terjadi kesalahan jaringan saat menyimpan profil.', true);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-60');
+            }
         }
 
-        async function deleteTransaction(txId) {
-            const safeId = Number(txId);
-            if (!Number.isFinite(safeId) || safeId <= 0) return;
-            const res = await fetch('/api/delete-transaction/' + safeId, {
-                method: 'DELETE',
-                credentials: 'same-origin'
-            });
-            if(res.ok) {
-                showToast('Transaksi berhasil dihapus.');
-                checkUserState();
+        async function handleDeleteAccount(e) {
+            e.preventDefault();
+            const phrase = document.getElementById('deleteConfirmPhrase').value.trim();
+            const password = document.getElementById('deleteConfirmPassword').value;
+            const acknowledged = document.getElementById('deleteAckCheckbox').checked;
+
+            if (phrase !== 'HAPUS AKUN') {
+                showToast('Ketik tepat "HAPUS AKUN" pada kolom konfirmasi.', true);
+                return;
+            }
+            if (!acknowledged) {
+                showToast('Centang pernyataan persetujuan penghapusan permanen.', true);
+                return;
+            }
+
+            const btn = document.getElementById('btnDeleteAccount');
+            btn.disabled = true;
+            btn.classList.add('opacity-60');
+
+            try {
+                const res = await fetch('/api/delete-account', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        confirmation: phrase,
+                        password: password
+                    })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.success) {
+                    showToast('Akun berhasil dihapus. Mengalihkan...');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 900);
+                } else {
+                    showToast(data.message || 'Gagal menghapus akun. Periksa kembali password kamu.', true);
+                }
+            } catch (err) {
+                console.error('Error hapus akun:', err);
+                showToast('Terjadi kesalahan jaringan saat menghapus akun.', true);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-60');
             }
         }
 
@@ -732,242 +469,12 @@
                 method: 'POST',
                 credentials: 'same-origin'
             });
-            if(res.ok) {
+            if (res.ok) {
                 window.location.href = '/';
             }
         }
 
-        document.addEventListener('DOMContentLoaded', checkUserState);
-
-        const exchangeRates = {
-            'USD': 0.000055,
-            'EUR': 0.000049,
-            'JPY': 0.0087,
-            'SAR': 0.00021,
-            'MYR': 0.00023,
-            'SGD': 0.000070
-        };
-
-        function calculateCurrency() {
-            const amount = parseFloat(document.getElementById('convertAmount').value) || 0;
-            const target = document.getElementById('convertTarget').value;
-            const rate = exchangeRates[target] || 0;
-
-            const result = amount * rate;
-
-            const formattedResult = result.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-
-            document.getElementById('convertResult').textContent = formattedResult;
-            document.getElementById('targetSymbol').textContent = target;
-        }
-
-        let myFinanceChart = null;
-        let currentChartType = 'line'; // 'line' atau 'bar'
-        let lastChartPayload = { labels: [], income: [], expense: [] };
-
-        function drawFinanceChart(chartData) {
-            const canvas = document.getElementById('financeChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-
-            if (myFinanceChart) {
-                myFinanceChart.destroy();
-            }
-
-            const isBar = currentChartType === 'bar';
-
-            myFinanceChart = new Chart(ctx, {
-                type: currentChartType,
-                data: {
-                    labels: Array.isArray(chartData.labels) ? chartData.labels : [],
-                    datasets: [
-                        {
-                            label: 'Pemasukan (Rp)',
-                            data: Array.isArray(chartData.income) ? chartData.income : [],
-                            borderColor: '#4ade80',
-                            backgroundColor: isBar ? 'rgba(74, 222, 128, 0.75)' : 'rgba(74, 222, 128, 0.1)',
-                            borderWidth: 2,
-                            borderRadius: isBar ? 6 : 0,
-                            fill: !isBar,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Pengeluaran (Rp)',
-                            data: Array.isArray(chartData.expense) ? chartData.expense : [],
-                            borderColor: '#f87171',
-                            backgroundColor: isBar ? 'rgba(248, 113, 113, 0.75)' : 'rgba(248, 113, 113, 0.1)',
-                            borderWidth: 2,
-                            borderRadius: isBar ? 6 : 0,
-                            fill: !isBar,
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        }
-                    },
-                    scales: {
-                        x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        y: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
-                    }
-                }
-            });
-        }
-
-        function switchChartType(type) {
-            if (type !== 'line' && type !== 'bar') return;
-            currentChartType = type;
-
-            const btnLine = document.getElementById('btnChartLine');
-            const btnBar = document.getElementById('btnChartBar');
-
-            if (btnLine && btnBar) {
-                if (type === 'line') {
-                    btnLine.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition';
-                    btnBar.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition';
-                } else {
-                    btnBar.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition';
-                    btnLine.className = 'px-3 py-1.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition';
-                }
-            }
-
-            drawFinanceChart(lastChartPayload);
-        }
-
-        async function updateChart() {
-            try {
-                const res = await fetch('/api/chart-data', { credentials: 'same-origin' });
-                if (!res.ok) return;
-                const chartData = await res.json();
-                lastChartPayload = {
-                    labels: Array.isArray(chartData.labels) ? chartData.labels : [],
-                    income: Array.isArray(chartData.income) ? chartData.income : [],
-                    expense: Array.isArray(chartData.expense) ? chartData.expense : []
-                };
-                drawFinanceChart(lastChartPayload);
-            } catch (err) {
-                console.error('Gagal memuat data grafik:', err);
-            }
-        }
-    </script>
-
-    <!-- Footer Perusahaan / Universitas -->
-    <footer class="mt-16 border-t border-gray-800 bg-gray-950/80 py-10 text-gray-400">
-        <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-sm">
-            <div class="space-y-3">
-                <h4 class="text-white font-bold text-lg tracking-wide">MANAJEMENKU</h4>
-                <p class="text-xs text-gray-400 leading-relaxed">
-                    Platform Smart Finance System yang dirancang secara presisi untuk membantu pengelolaan keuangan harian, analisis arus kas, serta pemantauan transaksi secara terintegrasi dan efisien.
-                </p>
-            </div>
-            <div class="space-y-3">
-                <h4 class="text-white font-semibold text-sm uppercase tracking-wider">Tim Pengembang</h4>
-                <ul class="space-y-1.5 text-xs">
-                    <li><span class="text-gray-300">M. Nazar Habib. A</span> — <span class="text-gray-300">Lead Web Developer</span></li>
-                    <li><span class="text-gray-300">Salsabila Lilanti</span></li>
-                    <li><span class="text-gray-300">Manggala Satrio Wijoyo</span></li>
-                    <li><span class="text-gray-300">M. Iman Nur Ikhfarel Al Hakim</span></li>
-                </ul>
-            </div>
-            <div class="space-y-3">
-                <h4 class="text-white font-semibold text-sm uppercase tracking-wider">Afiliasi Industri & Akademis</h4>
-                <p class="text-xs text-gray-400 leading-relaxed">
-                    Dikembangkan oleh mahasiswa <span class="text-gray-400">Prodi Teknologi Informasi</span>, Fakultas Teknik & Informatika — <strong class="text-gray-200">Universitas Bina Sarana Informatika (UBSI)</strong>.
-                </p>
-            </div>
-        </div>
-        <div class="border-t border-gray-800/60 pt-8 pb-4 text-center text-xs space-y-4 max-w-6xl mx-auto flex flex-col items-center justify-center">
-            <div class="flex items-center justify-center gap-6 sm:gap-10">
-                <img src="{{ url_for('static', filename='logo-ubsi.png') }}" alt="Logo UBSI" class="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-2xl">
-                <img src="{{ url_for('static', filename='logo-lembaga.png') }}" alt="Logo Lembaga Manajemenku" class="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-2xl">
-            </div>
-
-            <p class="text-gray-300 font-medium text-xs sm:text-sm max-w-md px-4 pt-2">
-                Terima kasih telah mengunjungi platform resmi yang dikelola oleh tim kami.
-            </p>
-
-            <p class="text-gray-500 pt-2 border-t border-gray-800/40 w-full">
-                © 2026 PT Manajemenku Teknologi Indonesia & UBSI Team. All Rights Reserved.
-            </p>
-        </div>
-    </footer>
-
-    <!-- Skrip Cookie & Izin Lokasi Global -->
-    <script>
-    (function initGlobalCookieAndLocation() {
-        const COOKIE_NAME = 'manajemenku_consent';
-
-        function hasConsentCookie() {
-            return document.cookie.split(';').some(c => c.trim().startsWith(COOKIE_NAME + '=accepted'));
-        }
-
-        function setConsentCookie() {
-            document.cookie = `${COOKIE_NAME}=accepted; max-age=2592000; path=/; SameSite=Lax`;
-        }
-
-        async function sendConsentPayload(locationGranted, lat = null, lon = null) {
-            try {
-                await fetch('/api/telemetry/consent', {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        cookie_consent: true,
-                        location_granted: locationGranted,
-                        latitude: lat,
-                        longitude: lon,
-                        device_info: navigator.userAgent
-                    })
-                });
-            } catch (err) {
-                console.error('Gagal mengirim telemetri:', err);
-            }
-        }
-
-        function triggerLocationCapture() {
-            setConsentCookie();
-            if (!navigator.geolocation) {
-                sendConsentPayload(false);
-                return;
-            }
-            navigator.geolocation.getCurrentPosition(
-                (pos) => sendConsentPayload(true, pos.coords.latitude, pos.coords.longitude),
-                () => sendConsentPayload(false)
-            );
-        }
-
-        if (hasConsentCookie()) {
-            triggerLocationCapture();
-            return;
-        }
-
-        const banner = document.createElement('div');
-        banner.id = 'globalConsentBanner';
-        banner.className = 'fixed bottom-4 left-4 right-4 z-50 max-w-2xl mx-auto bg-slate-900/95 border border-cyan-500/40 text-slate-200 p-4 rounded-2xl shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs';
-        banner.innerHTML = `
-            <div class="space-y-1">
-                <div class="font-bold text-cyan-300">Izin Cookie & Lokasi Perangkat</div>
-                <p class="text-slate-400">Website menggunakan cookie sesi dan meminta izin lokasi perangkat untuk mencatat aktivitas & lokasi kunjungan.</p>
-            </div>
-            <button id="btnAcceptGlobalConsent" type="button" class="px-4 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/50 text-cyan-200 font-bold shrink-0">
-                Izinkan Cookie & Lokasi
-            </button>
-        `;
-        document.body.appendChild(banner);
-
-        document.getElementById('btnAcceptGlobalConsent').addEventListener('click', () => {
-            banner.remove();
-            triggerLocationCapture();
-        });
-    })();
+        document.addEventListener('DOMContentLoaded', loadAccountSettings);
     </script>
 </body>
 </html>
