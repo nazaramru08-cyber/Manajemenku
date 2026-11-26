@@ -87,10 +87,7 @@
                 <a href="/tentang-kami" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-gray-200 hover:bg-gray-800/50 transition">
                     <i class="fa-solid fa-circle-info w-5"></i> Tentang Kami
                 </a>
-                </button>
-                </div>
             </div>
-    </div>
 
             <div class="p-4 border-t border-gray-800">
                 <button type="button" onclick="handleLogout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-rose-400 hover:bg-rose-500/10 transition text-sm font-semibold">
@@ -403,51 +400,8 @@
             if (res.ok) window.location.href = '/';
         }
 
-        function openPremiumModal() {
-            document.getElementById('modalPremium').classList.remove('hidden');
-        }
-
-        function closePremiumModal() {
-            document.getElementById('modalPremium').classList.add('hidden');
-        }
-
-        async function simulatePaymentSuccess() {
-            const res = await fetch('/api/upgrade-to-premium', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            if (!res.ok) return;
-            const data = await res.json();
-            if (data.success) {
-                showToast(data.message || 'Status akun berhasil diupgrade ke Premium.');
-                closePremiumModal();
-                checkPremiumSidebar();
-            }
-        }
-
-        async function checkPremiumSidebar() {
-            const container = document.getElementById('sidebarUpgradeContainer');
-            if (!container) return;
-            try {
-                const res = await fetch('/api/user-data', { credentials: 'same-origin' });
-                if (!res.ok) return;
-                const data = await res.json();
-                if (data.user && data.user.is_premium) {
-                    container.innerHTML = `
-                        <div class="px-3 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center gap-2 text-xs font-bold">
-                            <i class="fa-solid fa-crown"></i> Akun VIP Premium
-                        </div>
-                    `;
-                }
-            } catch (err) {
-                console.error('Gagal memeriksa status premium:', err);
-            }
-        }
-
         document.getElementById('debtDueDate').valueAsDate = new Date();
         renderRecords();
-        checkPremiumSidebar();
     </script>
 
     <!-- Skrip Cookie & Izin Lokasi Global -->
