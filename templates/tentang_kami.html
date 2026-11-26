@@ -140,7 +140,7 @@
                             <!-- Anggota 1 -->
                             <div class="bg-gray-900/75 border border-gray-800/90 rounded-2xl p-4 flex flex-col items-center text-center space-y-2.5">
                                 <div class="w-24 h-24 rounded-2xl overflow-hidden border border-indigo-500/35 bg-gray-800 shadow-md">
-                                    <img src="{{ url_for('static', filename='Habib_TI.png') }}" alt="Foto Muhammad Nazar Habib Amrullah" class="w-full h-full object-cover object-top">
+                                    <img src="{{ url_for('static', filename='Habib_TI.png') }}" alt="Foto Muhammad Nazar Habib Amrullah" class="w-full h-full object-cover">
                                 </div>
                                 <div class="space-y-1">
                                     <h3 class="text-sm font-bold text-white leading-snug">Muhammad Nazar Habib Amrullah</h3>
@@ -153,7 +153,7 @@
                             <!-- Anggota 2 -->
                             <div class="bg-gray-900/75 border border-gray-800/90 rounded-2xl p-4 flex flex-col items-center text-center space-y-2.5">
                                 <div class="w-24 h-24 rounded-2xl overflow-hidden border border-indigo-500/35 bg-gray-800 shadow-md">
-                                    <img src="{{ url_for('static', filename='Salsabila.jpeg') }}" alt="Foto Salsabila Lilanti" class="w-full h-full object-cover object-top">
+                                    <img src="{{ url_for('static', filename='Salsabila.jpeg') }}" alt="Foto Salsabila Lilanti" class="w-full h-full object-cover">
                                 </div>
                                 <div class="space-y-1">
                                     <h3 class="text-sm font-bold text-white leading-snug">Salsabila Lilanti</h3>
@@ -163,7 +163,7 @@
                                 </div>
                             </div>
 
-                            <!-- Anggota 3 -->
+                            <!-- Anggota 3 (Hanya Foto Manggala yang disesuaikan ke bagian kepala-dada) -->
                             <div class="bg-gray-900/75 border border-gray-800/90 rounded-2xl p-4 flex flex-col items-center text-center space-y-2.5">
                                 <div class="w-24 h-24 rounded-2xl overflow-hidden border border-indigo-500/35 bg-gray-800 shadow-md">
                                     <img src="{{ url_for('static', filename='Manggala.png') }}" alt="Foto Manggala Satrio Wijoyo" class="w-full h-full object-cover object-top">
@@ -179,7 +179,7 @@
                             <!-- Anggota 4 -->
                             <div class="bg-gray-900/75 border border-gray-800/90 rounded-2xl p-4 flex flex-col items-center text-center space-y-2.5">
                                 <div class="w-24 h-24 rounded-2xl overflow-hidden border border-indigo-500/35 bg-gray-800 shadow-md">
-                                    <img src="{{ url_for('static', filename='Farel.jpeg') }}" alt="Foto M Iman Nur Ikhfarel Al Hakim" class="w-full h-full object-cover object-top">
+                                    <img src="{{ url_for('static', filename='Farel.jpeg') }}" alt="Foto M Iman Nur Ikhfarel Al Hakim" class="w-full h-full object-cover">
                                 </div>
                                 <div class="space-y-1">
                                     <h3 class="text-sm font-bold text-white leading-snug">M Iman Nur Ikhfarel Al Hakim</h3>
@@ -318,11 +318,13 @@
         }
 
         function openPremiumModal() {
-            document.getElementById('modalPremium').classList.remove('hidden');
+            const modal = document.getElementById('modalPremium');
+            if (modal) modal.classList.remove('hidden');
         }
 
         function closePremiumModal() {
-            document.getElementById('modalPremium').classList.add('hidden');
+            const modal = document.getElementById('modalPremium');
+            if (modal) modal.classList.add('hidden');
         }
 
         async function simulatePaymentSuccess() {
