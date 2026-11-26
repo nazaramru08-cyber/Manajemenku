@@ -21,12 +21,12 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'manajemenku_secret_key')
 
 # Konfigurasi Gmail Pengirim OTP
-MAIL_SENDER = os.environ.get('MAIL_SENDER', 'muzarhabib@gmail.com')
-MAIL_APP_PASSWORD = os.environ.get('MAIL_APP_PASSWORD', 'avci qjht ymhu qmhl')
+MAIL_SENDER = os.environ.get('MAIL_SENDER', 'manajemenku17@gmail.com')
+MAIL_APP_PASSWORD = os.environ.get('MAIL_APP_PASSWORD', 'wjqu cqcq xhei algk')
 
 # Kredensial Khusus Admin Manajemenku
 ADMIN_NAME = 'Admin Manajemenku'
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'muzarhabib@gmail.com').strip().lower()
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'manajemenku17@gmail.com').strip().lower()
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'ubsi17260325')
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
